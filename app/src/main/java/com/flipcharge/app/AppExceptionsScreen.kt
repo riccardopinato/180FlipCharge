@@ -1,18 +1,33 @@
 package com.flipcharge.app
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.flipcharge.app.ui.theme.FlipBlue
+import com.flipcharge.app.ui.theme.FlipRose
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppExceptionsScreen(
     apps: List<InstalledAppInfo>,
@@ -23,82 +38,138 @@ fun AppExceptionsScreen(
     onToggleApp: (String, Boolean) -> Unit
 ) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_exceptions_title)) },
-                navigationIcon = {
-                    TextButton(onClick = onBack) {
-                        Text(stringResource(R.string.back))
-                    }
-                }
-            )
-        }
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
-
-        Column(
-            Modifier
+        LazyColumn(
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp)
+                .padding(padding),
+            contentPadding = PaddingValues(bottom = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    TextButton(
+                        onClick = onBack,
+                        contentPadding = PaddingValues(0.dp),
+                    ) {
+                        Text("←  " + stringResource(R.string.back))
+                    }
+                    Text(
+                        text = stringResource(R.string.exceptions_eyebrow),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        text = stringResource(R.string.app_exceptions_title),
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
+                    Text(
+                        text = stringResource(R.string.app_exceptions_intro_body),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
 
             if (!usageAccessGranted) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Column(Modifier.padding(18.dp)) {
-                        Text(
-                            stringResource(R.string.usage_access_title),
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            stringResource(R.string.usage_access_description),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Spacer(Modifier.height(10.dp))
-                        Button(onClick = onOpenUsageAccess) {
-                            Text(stringResource(R.string.open_usage_access_settings))
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = FlipRose.copy(alpha = 0.10f),
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(18.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.usage_access_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = FlipRose,
+                            )
+                            Text(
+                                text = stringResource(R.string.usage_access_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            TextButton(
+                                onClick = onOpenUsageAccess,
+                                contentPadding = PaddingValues(0.dp),
+                            ) {
+                                Text(stringResource(R.string.open_usage_access_settings))
+                            }
                         }
                     }
                 }
-
-                Spacer(Modifier.height(12.dp))
             }
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            if (apps.isEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(R.string.no_apps_found),
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            } else {
                 items(apps, key = { it.packageName }) { app ->
+                    val selected = excludedApps.contains(app.packageName)
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(18.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
+                        shape = RoundedCornerShape(22.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                     ) {
                         Row(
-                            Modifier.fillMaxWidth().padding(14.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            Column(Modifier.weight(1f)) {
+                            FlipStatusPill(
+                                text = if (selected) "180° OFF" else "180°",
+                                accent = if (selected) FlipRose else FlipBlue,
+                            )
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(2.dp),
+                            ) {
                                 Text(
-                                    app.label,
-                                    fontWeight = FontWeight.SemiBold
+                                    text = app.label,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
                                 )
                                 Text(
-                                    app.packageName,
-                                    style = MaterialTheme.typography.bodySmall
+                                    text = app.packageName,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
-
                             Switch(
-                                checked = excludedApps.contains(app.packageName),
-                                onCheckedChange = {
-                                    onToggleApp(app.packageName, it)
-                                }
+                                checked = selected,
+                                onCheckedChange = { onToggleApp(app.packageName, it) },
                             )
                         }
                     }
                 }
             }
+
+            item { Spacer(Modifier.height(2.dp)) }
         }
     }
 }
