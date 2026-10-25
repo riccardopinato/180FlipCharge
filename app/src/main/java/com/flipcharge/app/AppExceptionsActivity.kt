@@ -1,12 +1,12 @@
 package com.flipcharge.app
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.mutableStateOf
 import com.flipcharge.app.ui.theme.FlipChargeTheme
 
-class AppExceptionsActivity : ComponentActivity() {
+class AppExceptionsActivity : LocalizedActivity() {
 
     private val apps = mutableStateOf<List<InstalledAppInfo>>(emptyList())
     private val excluded = mutableStateOf<Set<String>>(emptySet())
@@ -14,6 +14,7 @@ class AppExceptionsActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         reload()
 
         setContent {

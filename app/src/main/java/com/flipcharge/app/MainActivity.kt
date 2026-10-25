@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,7 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import com.flipcharge.app.ui.theme.FlipChargeTheme
 
-class MainActivity : ComponentActivity() {
+class MainActivity : LocalizedActivity() {
 
     private val uiState = mutableStateOf(FlipState())
     private val overlayGranted = mutableStateOf(false)
@@ -82,12 +81,14 @@ class MainActivity : ComponentActivity() {
                     },
 
                     onManageAppExceptions = {
-                        startActivity(
-                            Intent(this, AppExceptionsActivity::class.java)
-                        )
+                        startActivity(Intent(this, AppExceptionsActivity::class.java))
                     },
 
-                    onOpenBatterySettings = ::openBatterySettings
+                    onOpenBatterySettings = ::openBatterySettings,
+
+                    onOpenSettings = {
+                        startActivity(Intent(this, SettingsActivity::class.java))
+                    },
                 )
             }
         }

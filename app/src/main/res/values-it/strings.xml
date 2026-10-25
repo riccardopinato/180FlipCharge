@@ -4,10 +4,17 @@
     <string name="app_subtitle">Rotazione 180° intelligente per ricarica e uso quotidiano</string>
     <string name="home_eyebrow">ROTAZIONE SMART</string>
     <string name="hero_title">Modalità di rotazione attuale</string>
+    <string name="open_settings">Apri impostazioni</string>
+    <string name="settings_eyebrow">PREFERENZE</string>
+    <string name="settings_title">Impostazioni</string>
+    <string name="settings_subtitle">Personalizza 180FlipCharge senza modificare il funzionamento della rotazione.</string>
+    <string name="language_title">Lingua</string>
+    <string name="language_description">Scegli la lingua dell’app oppure lascia che Android segua la lingua del dispositivo.</string>
+    <string name="language_system">Lingua dispositivo</string>
+    <string name="language_system_note">La lingua del dispositivo è l’impostazione predefinita. Da Android 13 la scelta viene sincronizzata con le impostazioni lingua per-app di Android.</string>
 
     <string name="enable_forced_180">ATTIVA 180°</string>
     <string name="disable_forced_180">DISATTIVA 180°</string>
-
     <string name="status_off">Controllo 180° disattivato</string>
     <string name="status_force_180">180° forzato</string>
     <string name="status_charging">180° forzato durante la ricarica</string>
@@ -17,7 +24,6 @@
     <string name="permanent_180_title">Auto 180°</string>
     <string name="permanent_180_description">Estende la rotazione automatica a 0°, 90°, 180° e 270° e resta attiva in background.</string>
     <string name="permanent_180_short">0°, 90°, 180° e 270° in automatico</string>
-
     <string name="auto_charge_title">Ricarica</string>
     <string name="auto_charge_description">Forza 180° quando colleghi l’alimentazione e torna alla modalità precedente quando la scolleghi.</string>
     <string name="auto_charge_short">Ruota automaticamente quando colleghi il cavo</string>
@@ -37,7 +43,6 @@
     <string name="app_exceptions_intro_body">Quando una di queste app è in primo piano, 180FlipCharge ripristina temporaneamente l’orientamento normale.</string>
     <string name="app_exceptions_none_selected">Nessuna app selezionata.</string>
     <string name="exceptions_eyebrow">CONTROLLO APP</string>
-
     <plurals name="app_exceptions_selected_count">
         <item quantity="one">%d app esclusa</item>
         <item quantity="other">%d app escluse</item>
@@ -46,7 +51,6 @@
     <string name="usage_access_title">Accesso utilizzo app richiesto</string>
     <string name="usage_access_description">Questo permesso permette a 180FlipCharge di capire quale app è aperta e applicare le eccezioni.</string>
     <string name="open_usage_access_settings">APRI ACCESSO UTILIZZO APP</string>
-
     <string name="background_title">Affidabilità in background</string>
     <string name="background_description">Controlla le impostazioni batteria per rendere più affidabile la rotazione continua.</string>
     <string name="open_battery_settings">IMPOSTAZIONI BATTERIA</string>
@@ -57,13 +61,11 @@
     <string name="tile_charging">In carica</string>
     <string name="tile_waiting">In attesa</string>
     <string name="tile_off">Off</string>
-
     <string name="notification_channel_name">Servizio rotazione 180°</string>
     <string name="notification_manual_active">Rotazione 180° forzata</string>
     <string name="notification_charging_active">Rotazione 180° forzata durante la ricarica</string>
     <string name="notification_permanent_auto">Auto + 180° permanente attivo</string>
     <string name="notification_waiting_charge">In attesa del caricatore</string>
-
     <string name="back">Indietro</string>
     <string name="no_apps_found">Nessuna app avviabile trovata.</string>
 </resources>

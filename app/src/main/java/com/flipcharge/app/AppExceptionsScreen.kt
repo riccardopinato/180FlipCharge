@@ -77,11 +77,13 @@ fun AppExceptionsScreen(
 
             if (!usageAccessGranted) {
                 item {
+                    val shape = RoundedCornerShape(24.dp)
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
-                        shape = RoundedCornerShape(24.dp),
+                            .padding(horizontal = 20.dp)
+                            .flipGradientBorder(shape),
+                        shape = shape,
                         colors = CardDefaults.cardColors(
                             containerColor = FlipRose.copy(alpha = 0.10f),
                         ),
@@ -124,11 +126,13 @@ fun AppExceptionsScreen(
             } else {
                 items(apps, key = { it.packageName }) { app ->
                     val selected = excludedApps.contains(app.packageName)
+                    val shape = RoundedCornerShape(22.dp)
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
-                        shape = RoundedCornerShape(22.dp),
+                            .padding(horizontal = 20.dp)
+                            .flipGradientBorder(shape),
+                        shape = shape,
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surface,
                         ),
