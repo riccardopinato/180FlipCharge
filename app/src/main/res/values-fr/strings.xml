@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">180FlipCharge</string>
+    <string name="app_name">Rotate 180°</string>
     <string name="app_subtitle">Rotation 180° intelligente pour la charge et l’usage quotidien</string>
     <string name="home_eyebrow">ROTATION INTELLIGENTE</string>
     <string name="hero_title">Mode de rotation actuel</string>
@@ -59,4 +59,14 @@
     <string name="notification_waiting_charge">En attente du chargeur</string>
     <string name="back">Retour</string>
     <string name="no_apps_found">Aucune app lançable trouvée.</string>
+
+    <string name="notification_stop">ARRÊTER</string>
+    <string name="runtime_overlay_missing">L’autorisation de superposition est requise</string>
+    <string name="runtime_overlay_error">Impossible de démarrer la superposition de rotation</string>
+    <string name="runtime_sensor_unavailable">Capteur d’orientation indisponible</string>
+    <string name="runtime_service_blocked">Android a bloqué le service de rotation</string>
+    <string name="runtime_service_stopped">Le service de rotation s’est arrêté</string>
+    <string name="runtime_suspended_exception">En pause pour l’exception de l’app actuelle</string>
+    <string name="runtime_screen_off">En pause lorsque l’écran est éteint</string>
+    <string name="runtime_starting">Démarrage du contrôle de rotation…</string>
 </resources>

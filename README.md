@@ -1,11 +1,12 @@
-# 180FlipCharge
+# Rotate 180°
 
 Lightweight Android utility that adds reliable reverse portrait / 180° rotation controls.
 
 ## Current baseline
 
-- Package: `com.flipcharge.app`
-- Version: `0.6.1` (`versionCode 7`)
+- Display name: `Rotate 180°`
+- Legacy package identity: `com.flipcharge.app`
+- Version: `0.7.0` (`versionCode 8`)
 - Native Kotlin + Jetpack Compose
 - Android `minSdk 26`, `targetSdk 36`
 - Manual fixed 180° mode
@@ -18,6 +19,7 @@ Lightweight Android utility that adds reliable reverse portrait / 180° rotation
 - Release R8 + resource shrinking
 - Release APK budget: **8 MiB**
 - Release AAB budget: **10 MiB**
+- Commercial model: **paid upfront €4.99; no ads**
 - Minimal black `180°` pixel-art adaptive launcher icon
 
 ## Signing

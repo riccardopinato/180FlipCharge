@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">180FlipCharge</string>
+    <string name="app_name">Rotate 180°</string>
     <string name="app_subtitle">Intelligente 180°-Drehung beim Laden und im Alltag</string>
     <string name="home_eyebrow">SMARTE DREHUNG</string>
     <string name="hero_title">Aktueller Drehmodus</string>
@@ -59,4 +59,14 @@
     <string name="notification_waiting_charge">Wartet auf Ladegerät</string>
     <string name="back">Zurück</string>
     <string name="no_apps_found">Keine startbaren Apps gefunden.</string>
+
+    <string name="notification_stop">STOPP</string>
+    <string name="runtime_overlay_missing">Overlay-Berechtigung erforderlich</string>
+    <string name="runtime_overlay_error">Rotations-Overlay konnte nicht gestartet werden</string>
+    <string name="runtime_sensor_unavailable">Orientierungssensor nicht verfügbar</string>
+    <string name="runtime_service_blocked">Android hat den Rotationsdienst blockiert</string>
+    <string name="runtime_service_stopped">Rotationsdienst wurde unerwartet beendet</string>
+    <string name="runtime_suspended_exception">Pausiert wegen der aktuellen App-Ausnahme</string>
+    <string name="runtime_screen_off">Pausiert, solange der Bildschirm ausgeschaltet ist</string>
+    <string name="runtime_starting">Rotationssteuerung wird gestartet…</string>
 </resources>

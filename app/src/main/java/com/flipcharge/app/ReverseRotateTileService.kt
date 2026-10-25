@@ -31,30 +31,30 @@ class ReverseRotateTileService : TileService() {
         val tile = qsTile ?: return
         val state = RotationController.currentState(this)
 
-        tile.state = if (state.manualEnabled) {
+        tile.state = if (state.active) {
             Tile.STATE_ACTIVE
         } else {
             Tile.STATE_INACTIVE
         }
 
-        tile.label = getString(R.string.tile_label)
+        tile.label = AppStrings.get(this, R.string.tile_label)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            tile.subtitle = when {
-                state.manualEnabled ->
-                    getString(R.string.tile_force_180)
+            tile.subtitle = when (state.tileMode()) {
+                TileMode.FORCE_180 ->
+                    AppStrings.get(this, R.string.tile_force_180)
 
-                state.permanentAutoEnabled ->
-                    getString(R.string.tile_auto_180)
+                TileMode.CHARGING ->
+                    AppStrings.get(this, R.string.tile_charging)
 
-                state.chargingContribution ->
-                    getString(R.string.tile_charging)
+                TileMode.AUTO_180 ->
+                    AppStrings.get(this, R.string.tile_auto_180)
 
-                state.autoChargeEnabled ->
-                    getString(R.string.tile_waiting)
+                TileMode.WAITING ->
+                    AppStrings.get(this, R.string.tile_waiting)
 
-                else ->
-                    getString(R.string.tile_off)
+                TileMode.OFF ->
+                    AppStrings.get(this, R.string.tile_off)
             }
         }
 
@@ -72,7 +72,7 @@ class ReverseRotateTileService : TileService() {
                 this,
                 180,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
             startActivityAndCollapse(pendingIntent)
         } else {

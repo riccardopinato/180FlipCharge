@@ -23,10 +23,18 @@ class MainActivity : LocalizedActivity() {
     private val notificationsGranted = mutableStateOf(true)
     private val usageAccessGranted = mutableStateOf(false)
     private val excludedAppsCount = mutableIntStateOf(0)
+    private val runtimeHealth = mutableStateOf(RuntimeHealth.IDLE)
 
     private val prefListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
             runOnUiThread { refreshState() }
+        }
+
+    private val runtimeListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+            runOnUiThread {
+                runtimeHealth.value = RuntimeHealthStore(this).read()
+            }
         }
 
     private val notificationPermissionLauncher =
@@ -47,6 +55,7 @@ class MainActivity : LocalizedActivity() {
                     notificationPermissionGranted = notificationsGranted.value,
                     usageAccessGranted = usageAccessGranted.value,
                     excludedAppsCount = excludedAppsCount.intValue,
+                    runtimeHealth = runtimeHealth.value,
                     showNotificationPermission =
                         Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU,
 
@@ -97,10 +106,12 @@ class MainActivity : LocalizedActivity() {
     override fun onStart() {
         super.onStart()
         AppPreferences(this).addListener(prefListener)
+        RuntimeHealthStore(this).addListener(runtimeListener)
     }
 
     override fun onStop() {
         AppPreferences(this).removeListener(prefListener)
+        RuntimeHealthStore(this).removeListener(runtimeListener)
         super.onStop()
     }
 
@@ -121,6 +132,7 @@ class MainActivity : LocalizedActivity() {
         overlayGranted.value = Settings.canDrawOverlays(this)
         usageAccessGranted.value =
             UsageAccessHelper.hasUsageAccessPermission(this)
+        runtimeHealth.value = RuntimeHealthStore(this).read()
 
         notificationsGranted.value =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

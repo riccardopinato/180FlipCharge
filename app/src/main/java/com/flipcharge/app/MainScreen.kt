@@ -45,6 +45,7 @@ fun MainScreen(
     notificationPermissionGranted: Boolean,
     usageAccessGranted: Boolean,
     excludedAppsCount: Int,
+    runtimeHealth: RuntimeHealth,
     showNotificationPermission: Boolean,
     onRequestOverlayPermission: () -> Unit,
     onRequestNotificationPermission: () -> Unit,
@@ -114,22 +115,13 @@ fun MainScreen(
                         ActiveRotationMode.OFF -> "0°"
                     }
 
-                    val status = when (state.source) {
-                        ActivationSource.MANUAL -> stringResource(R.string.status_force_180)
-                        ActivationSource.CHARGING -> stringResource(R.string.status_charging)
-                        ActivationSource.PERMANENT_AUTO -> stringResource(R.string.status_permanent_auto)
-                        ActivationSource.NONE -> if (state.autoChargeEnabled) {
-                            stringResource(R.string.status_waiting_charge)
-                        } else {
-                            stringResource(R.string.status_off)
-                        }
-                    }
+                    val status = runtimeHealthLabel(runtimeHealth, state)
 
                     FlipHeroCard(
                         value = heroValue,
                         title = stringResource(R.string.hero_title),
                         detail = status,
-                        active = state.active,
+                        active = state.active && runtimeHealth.isOperational,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -324,5 +316,54 @@ private fun PermissionCard(
                 fontWeight = FontWeight.Bold,
             )
         }
+    }
+}
+
+
+@Composable
+private fun runtimeHealthLabel(
+    health: RuntimeHealth,
+    state: FlipState,
+): String = when (health) {
+    RuntimeHealth.MISSING_OVERLAY_PERMISSION ->
+        stringResource(R.string.runtime_overlay_missing)
+
+    RuntimeHealth.OVERLAY_ERROR ->
+        stringResource(R.string.runtime_overlay_error)
+
+    RuntimeHealth.SENSOR_UNAVAILABLE ->
+        stringResource(R.string.runtime_sensor_unavailable)
+
+    RuntimeHealth.SERVICE_START_BLOCKED ->
+        stringResource(R.string.runtime_service_blocked)
+
+    RuntimeHealth.SERVICE_STOPPED ->
+        stringResource(R.string.runtime_service_stopped)
+
+    RuntimeHealth.SUSPENDED_APP_EXCEPTION ->
+        stringResource(R.string.runtime_suspended_exception)
+
+    RuntimeHealth.SUSPENDED_SCREEN_OFF ->
+        stringResource(R.string.runtime_screen_off)
+
+    RuntimeHealth.STARTING ->
+        stringResource(R.string.runtime_starting)
+
+    RuntimeHealth.WAITING_CHARGER ->
+        stringResource(R.string.status_waiting_charge)
+
+    RuntimeHealth.ACTIVE_MANUAL ->
+        stringResource(R.string.status_force_180)
+
+    RuntimeHealth.ACTIVE_CHARGING ->
+        stringResource(R.string.status_charging)
+
+    RuntimeHealth.ACTIVE_AUTO ->
+        stringResource(R.string.status_permanent_auto)
+
+    RuntimeHealth.IDLE -> if (state.autoChargeEnabled) {
+        stringResource(R.string.status_waiting_charge)
+    } else {
+        stringResource(R.string.status_off)
     }
 }

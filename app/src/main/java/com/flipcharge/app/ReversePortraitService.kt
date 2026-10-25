@@ -12,8 +12,11 @@ import android.view.*
 class ReversePortraitService : Service() {
 
     private lateinit var prefs: AppPreferences
+    private lateinit var healthStore: RuntimeHealthStore
     private lateinit var windowManager: WindowManager
     private lateinit var orientationEngine: RotationOrientationEngine
+
+    private val foregroundTracker = ForegroundAppTracker()
 
     private var overlayView: View? = null
     private var overlayParams: WindowManager.LayoutParams? = null
@@ -31,7 +34,7 @@ class ReversePortraitService : Service() {
         override fun run() {
             checkForegroundApp()
             if (appMonitorRunning) {
-                handler.postDelayed(this, 1200L)
+                handler.postDelayed(this, APP_MONITOR_INTERVAL_MS)
             }
         }
     }
@@ -68,6 +71,9 @@ class ReversePortraitService : Service() {
                 Intent.ACTION_SCREEN_OFF -> {
                     screenOn = false
                     orientationEngine.stop()
+                    stopAppMonitor()
+                    suppressedByExcludedApp = false
+                    healthStore.write(RuntimeHealth.SUSPENDED_SCREEN_OFF)
                 }
             }
         }
@@ -77,6 +83,7 @@ class ReversePortraitService : Service() {
         super.onCreate()
 
         prefs = AppPreferences(this)
+        healthStore = RuntimeHealthStore(this)
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
         orientationEngine = RotationOrientationEngine(this) { orientation ->
@@ -84,10 +91,13 @@ class ReversePortraitService : Service() {
                 prefs.readState().effectiveMode == ActiveRotationMode.PERMANENT_AUTO &&
                 !suppressedByExcludedApp
             ) {
-                showOrUpdateOverlay(orientation)
+                if (!showOrUpdateOverlay(orientation)) {
+                    healthStore.write(RuntimeHealth.OVERLAY_ERROR)
+                }
             }
         }
 
+        healthStore.write(RuntimeHealth.STARTING)
         createNotificationChannel()
         startForegroundInternal()
         prefs.addListener(preferenceListener)
@@ -98,6 +108,13 @@ class ReversePortraitService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == RotationController.ACTION_STOP_ALL) {
+            RotationController.stopAll(this)
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
+        createNotificationChannel()
         ChargingStateDetector.syncIntoPreferences(this)
         applyCurrentState()
 
@@ -117,46 +134,83 @@ class ReversePortraitService : Service() {
             orientationEngine.stop()
             stopAppMonitor()
             suppressedByExcludedApp = false
+            foregroundTracker.reset()
             removeOverlay()
+            healthStore.write(RuntimeHealth.IDLE)
             RotationController.notifyStateChanged(this)
             stopSelf()
             return
         }
 
+        if (state.active && !Settings.canDrawOverlays(this)) {
+            orientationEngine.stop()
+            stopAppMonitor()
+            suppressedByExcludedApp = false
+            removeOverlay()
+            healthStore.write(RuntimeHealth.MISSING_OVERLAY_PERMISSION)
+            updateNotification(state)
+            RotationController.notifyStateChanged(this)
+            return
+        }
+
         updateAppMonitorState(state)
+
+        if (suppressedByExcludedApp) {
+            orientationEngine.stop()
+            removeOverlay()
+            healthStore.write(RuntimeHealth.SUSPENDED_APP_EXCEPTION)
+            updateNotification(state)
+            RotationController.notifyStateChanged(this)
+            return
+        }
 
         when (state.effectiveMode) {
             ActiveRotationMode.OFF -> {
                 orientationEngine.stop()
                 removeOverlay()
+                healthStore.write(
+                    if (state.autoChargeEnabled) {
+                        RuntimeHealth.WAITING_CHARGER
+                    } else {
+                        RuntimeHealth.IDLE
+                    },
+                )
             }
 
             ActiveRotationMode.FORCE_REVERSE_PORTRAIT -> {
                 orientationEngine.stop()
 
-                if (!suppressedByExcludedApp && Settings.canDrawOverlays(this)) {
-                    showOrUpdateOverlay(
-                        ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
-                    )
-                } else {
-                    removeOverlay()
-                }
+                val attached = showOrUpdateOverlay(
+                    ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT,
+                )
+
+                healthStore.write(
+                    if (!attached) {
+                        RuntimeHealth.OVERLAY_ERROR
+                    } else if (state.source == ActivationSource.CHARGING) {
+                        RuntimeHealth.ACTIVE_CHARGING
+                    } else {
+                        RuntimeHealth.ACTIVE_MANUAL
+                    },
+                )
             }
 
             ActiveRotationMode.PERMANENT_AUTO -> {
-                if (
-                    screenOn &&
-                    !suppressedByExcludedApp &&
-                    Settings.canDrawOverlays(this)
-                ) {
-                    showOrUpdateOverlay(
-                        orientationEngine.lastOrientationOrDefault()
-                    )
-                    orientationEngine.start()
-                } else {
+                if (!screenOn) {
                     orientationEngine.stop()
-                    if (suppressedByExcludedApp) {
-                        removeOverlay()
+                    healthStore.write(RuntimeHealth.SUSPENDED_SCREEN_OFF)
+                } else {
+                    val attached = showOrUpdateOverlay(
+                        orientationEngine.lastOrientationOrDefault(),
+                    )
+
+                    if (!attached) {
+                        orientationEngine.stop()
+                        healthStore.write(RuntimeHealth.OVERLAY_ERROR)
+                    } else if (!orientationEngine.start()) {
+                        healthStore.write(RuntimeHealth.SENSOR_UNAVAILABLE)
+                    } else {
+                        healthStore.write(RuntimeHealth.ACTIVE_AUTO)
                     }
                 }
             }
@@ -166,10 +220,10 @@ class ReversePortraitService : Service() {
         RotationController.notifyStateChanged(this)
     }
 
-    private fun showOrUpdateOverlay(requestedOrientation: Int) {
+    private fun showOrUpdateOverlay(requestedOrientation: Int): Boolean {
         if (!Settings.canDrawOverlays(this)) {
             removeOverlay()
-            return
+            return false
         }
 
         if (overlayView == null) {
@@ -186,7 +240,7 @@ class ReversePortraitService : Service() {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
                     WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                PixelFormat.TRANSLUCENT
+                PixelFormat.TRANSLUCENT,
             ).apply {
                 gravity = Gravity.TOP or Gravity.START
                 x = 0
@@ -194,26 +248,31 @@ class ReversePortraitService : Service() {
                 screenOrientation = requestedOrientation
             }
 
-            try {
+            return try {
                 windowManager.addView(view, params)
                 overlayView = view
                 overlayParams = params
+                true
             } catch (_: Exception) {
                 overlayView = null
                 overlayParams = null
+                false
             }
-            return
         }
 
-        val params = overlayParams ?: return
+        val params = overlayParams ?: return false
 
         if (params.screenOrientation != requestedOrientation) {
             params.screenOrientation = requestedOrientation
-            try {
+            return try {
                 windowManager.updateViewLayout(overlayView, params)
+                true
             } catch (_: Exception) {
+                false
             }
         }
+
+        return true
     }
 
     private fun removeOverlay() {
@@ -241,7 +300,7 @@ class ReversePortraitService : Service() {
                 registerReceiver(
                     powerReceiver,
                     filter,
-                    Context.RECEIVER_NOT_EXPORTED
+                    Context.RECEIVER_NOT_EXPORTED,
                 )
             } else {
                 @Suppress("DEPRECATION")
@@ -270,7 +329,7 @@ class ReversePortraitService : Service() {
             registerReceiver(
                 screenReceiver,
                 filter,
-                Context.RECEIVER_NOT_EXPORTED
+                Context.RECEIVER_NOT_EXPORTED,
             )
         } else {
             @Suppress("DEPRECATION")
@@ -282,21 +341,23 @@ class ReversePortraitService : Service() {
 
     private fun updateAppMonitorState(state: FlipState) {
         val shouldMonitor =
-            state.active &&
+            screenOn &&
+                state.active &&
                 prefs.getExcludedApps().isNotEmpty() &&
                 UsageAccessHelper.hasUsageAccessPermission(this)
 
         if (shouldMonitor && !appMonitorRunning) {
             appMonitorRunning = true
             handler.post(monitorRunnable)
-        } else if (!shouldMonitor && appMonitorRunning) {
+        } else if (!shouldMonitor) {
             stopAppMonitor()
             suppressedByExcludedApp = false
+            foregroundTracker.reset()
         }
     }
 
     private fun checkForegroundApp() {
-        val foreground = UsageAccessHelper.getForegroundPackageName(this)
+        val foreground = foregroundTracker.resolve(this)
         val excluded =
             foreground != null &&
                 prefs.getExcludedApps().contains(foreground)
@@ -307,6 +368,9 @@ class ReversePortraitService : Service() {
             if (excluded) {
                 orientationEngine.stop()
                 removeOverlay()
+                healthStore.write(RuntimeHealth.SUSPENDED_APP_EXCEPTION)
+                updateNotification(prefs.readState())
+                RotationController.notifyStateChanged(this)
             } else {
                 applyCurrentState()
             }
@@ -325,13 +389,13 @@ class ReversePortraitService : Service() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(
-                180,
+                NOTIFICATION_ID,
                 notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
             )
         } else {
             @Suppress("DEPRECATION")
-            startForeground(180, notification)
+            startForeground(NOTIFICATION_ID, notification)
         }
 
         foregroundStarted = true
@@ -339,36 +403,52 @@ class ReversePortraitService : Service() {
 
     private fun updateNotification(state: FlipState) {
         getSystemService(NotificationManager::class.java)
-            .notify(180, buildNotification(state))
+            .notify(NOTIFICATION_ID, buildNotification(state))
     }
 
     private fun buildNotification(state: FlipState): Notification {
-        val pending = PendingIntent.getActivity(
+        val openPending = PendingIntent.getActivity(
             this,
             0,
             Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        val stopPending = PendingIntent.getService(
+            this,
+            1,
+            Intent(this, ReversePortraitService::class.java).apply {
+                action = RotationController.ACTION_STOP_ALL
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
         val text = when (state.source) {
             ActivationSource.MANUAL ->
-                getString(R.string.notification_manual_active)
+                AppStrings.get(this, R.string.notification_manual_active)
 
             ActivationSource.CHARGING ->
-                getString(R.string.notification_charging_active)
+                AppStrings.get(this, R.string.notification_charging_active)
 
             ActivationSource.PERMANENT_AUTO ->
-                getString(R.string.notification_permanent_auto)
+                AppStrings.get(this, R.string.notification_permanent_auto)
 
             ActivationSource.NONE ->
-                getString(R.string.notification_waiting_charge)
+                AppStrings.get(this, R.string.notification_waiting_charge)
         }
 
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_rotate_180)
-            .setContentTitle(getString(R.string.app_name))
+            .setContentTitle(AppStrings.get(this, R.string.app_name))
             .setContentText(text)
-            .setContentIntent(pending)
+            .setContentIntent(openPending)
+            .addAction(
+                Notification.Action.Builder(
+                    null,
+                    AppStrings.get(this, R.string.notification_stop),
+                    stopPending,
+                ).build(),
+            )
             .setOnlyAlertOnce(true)
             .setOngoing(true)
             .setCategory(Notification.CATEGORY_SERVICE)
@@ -379,8 +459,8 @@ class ReversePortraitService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                getString(R.string.notification_channel_name),
-                NotificationManager.IMPORTANCE_LOW
+                AppStrings.get(this, R.string.notification_channel_name),
+                NotificationManager.IMPORTANCE_LOW,
             )
 
             getSystemService(NotificationManager::class.java)
@@ -392,6 +472,7 @@ class ReversePortraitService : Service() {
         prefs.removeListener(preferenceListener)
         orientationEngine.stop()
         stopAppMonitor()
+        foregroundTracker.reset()
 
         if (powerReceiverRegistered) {
             try {
@@ -408,6 +489,13 @@ class ReversePortraitService : Service() {
         }
 
         removeOverlay()
+
+        if (prefs.readState().serviceNeeded) {
+            healthStore.write(RuntimeHealth.SERVICE_STOPPED)
+        } else {
+            healthStore.write(RuntimeHealth.IDLE)
+        }
+
         RotationController.notifyStateChanged(this)
         super.onDestroy()
     }
@@ -416,5 +504,7 @@ class ReversePortraitService : Service() {
 
     companion object {
         private const val CHANNEL_ID = "flipcharge_rotation_service"
+        private const val NOTIFICATION_ID = 180
+        private const val APP_MONITOR_INTERVAL_MS = 2_000L
     }
 }

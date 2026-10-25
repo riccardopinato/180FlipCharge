@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 object RotationController {
 
     const val ACTION_REFRESH = "com.flipcharge.app.action.REFRESH"
+    const val ACTION_STOP_ALL = "com.flipcharge.app.action.STOP_ALL"
 
     fun hasOverlayPermission(context: Context): Boolean =
         Settings.canDrawOverlays(context)
@@ -51,6 +52,16 @@ object RotationController {
         notifyStateChanged(context)
     }
 
+    fun stopAll(context: Context) {
+        val prefs = AppPreferences(context)
+        prefs.disableAll()
+        RuntimeHealthStore(context).write(RuntimeHealth.IDLE)
+        context.applicationContext.stopService(
+            Intent(context.applicationContext, ReversePortraitService::class.java),
+        )
+        notifyStateChanged(context)
+    }
+
     fun suppressChargingUntilUnplugged(context: Context) {
         val prefs = AppPreferences(context)
         val state = prefs.readState()
@@ -68,6 +79,7 @@ object RotationController {
         val state = prefs.readState()
 
         if (!state.serviceNeeded) {
+            RuntimeHealthStore(context).write(RuntimeHealth.IDLE)
             notifyStateChanged(context)
             return
         }
@@ -80,11 +92,13 @@ object RotationController {
     fun reconcileService(context: Context) {
         val appContext = context.applicationContext
         val state = AppPreferences(appContext).readState()
+        val health = RuntimeHealthStore(appContext)
 
         if (!state.serviceNeeded) {
             appContext.stopService(
-                Intent(appContext, ReversePortraitService::class.java)
+                Intent(appContext, ReversePortraitService::class.java),
             )
+            health.write(RuntimeHealth.IDLE)
             notifyStateChanged(appContext)
             return
         }
@@ -93,12 +107,15 @@ object RotationController {
             action = ACTION_REFRESH
         }
 
+        health.write(RuntimeHealth.STARTING)
+
         try {
             ContextCompat.startForegroundService(appContext, intent)
         } catch (_: Exception) {
-            // Lo stato rimane persistito e verrà riconciliato alla prossima
-            // interazione consentita dal sistema.
+            health.write(RuntimeHealth.SERVICE_START_BLOCKED)
         }
+
+        notifyStateChanged(appContext)
     }
 
     fun notifyStateChanged(context: Context) {
@@ -107,8 +124,8 @@ object RotationController {
                 context.applicationContext,
                 ComponentName(
                     context.applicationContext,
-                    ReverseRotateTileService::class.java
-                )
+                    ReverseRotateTileService::class.java,
+                ),
             )
         } catch (_: Exception) {
         }

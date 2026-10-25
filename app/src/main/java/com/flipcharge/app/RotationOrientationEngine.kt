@@ -7,7 +7,7 @@ import android.view.OrientationEventListener
 
 class RotationOrientationEngine(
     context: Context,
-    private val onStableOrientationChanged: (Int) -> Unit
+    private val onStableOrientationChanged: (Int) -> Unit,
 ) {
 
     private var enabled = false
@@ -17,7 +17,7 @@ class RotationOrientationEngine(
 
     private val listener = object : OrientationEventListener(
         context.applicationContext,
-        SensorManager.SENSOR_DELAY_NORMAL
+        SensorManager.SENSOR_DELAY_NORMAL,
     ) {
         override fun onOrientationChanged(orientation: Int) {
             if (!enabled || orientation == ORIENTATION_UNKNOWN) return
@@ -41,15 +41,15 @@ class RotationOrientationEngine(
         }
     }
 
-    fun start() {
-        if (enabled) return
+    fun start(): Boolean {
+        if (enabled) return true
+        if (!listener.canDetectOrientation()) return false
+
         enabled = true
         candidateOrientation = null
         candidateSince = 0L
-
-        if (listener.canDetectOrientation()) {
-            listener.enable()
-        }
+        listener.enable()
+        return true
     }
 
     fun stop() {
