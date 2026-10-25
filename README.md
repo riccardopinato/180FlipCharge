@@ -6,11 +6,11 @@ Lightweight Android utility that adds reliable reverse portrait / 180° rotation
 
 - Display name: `Rotate 180°`
 - Legacy package identity: `com.flipcharge.app`
-- Version: `0.7.0` (`versionCode 8`)
+- Version: `0.7.1` (`versionCode 9`)
 - Native Kotlin + Jetpack Compose
 - Android `minSdk 26`, `targetSdk 36`
 - Manual fixed 180° mode
-- Permanent auto rotation with 0° / 90° / 180° / 270°
+- Permanent portrait flip with 0° / 180° only — never 90° / 270°
 - Charging automation
 - Quick Settings Tile
 - App Exceptions using Usage Access
@@ -32,4 +32,4 @@ GitHub Actions is the canonical build path. `Development checks` validates test/
 
 ## Factory baseline
 
-App Factory Core baseline used for this consolidation: `4cc0b94467b94ab6fabe2c927fcc58afff49e39a`.
+App Factory Core baseline used for this fix: `1b4d39a558bff76d08ea7ccc1ce44d6cdb398e1e`.

@@ -23,6 +23,15 @@ class RotationOrientationEngine(
             if (!enabled || orientation == ORIENTATION_UNKNOWN) return
 
             val mapped = mapDegreesToRequestedOrientation(orientation)
+
+            if (mapped == null) {
+                // Sideways / landscape-like positions are intentionally neutral.
+                // Auto 180° must never rotate the device to 90° or 270°.
+                candidateOrientation = null
+                candidateSince = 0L
+                return
+            }
+
             val now = android.os.SystemClock.elapsedRealtime()
 
             if (mapped != candidateOrientation) {
@@ -66,40 +75,16 @@ class RotationOrientationEngine(
     fun lastOrientationOrDefault(): Int =
         lastAppliedOrientation ?: ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-    private fun mapDegreesToRequestedOrientation(degrees: Int): Int {
-        return when {
-            degrees >= 330 || degrees < 30 ->
+    private fun mapDegreesToRequestedOrientation(degrees: Int): Int? =
+        when (PortraitFlipClassifier.classify(degrees)) {
+            PortraitFlip.UPRIGHT ->
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-            degrees in 60..120 ->
-                ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
-
-            degrees in 150..210 ->
+            PortraitFlip.UPSIDE_DOWN ->
                 ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
 
-            degrees in 240..300 ->
-                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-
-            else ->
-                lastAppliedOrientation ?: nearestOrientation(degrees)
+            null -> null
         }
-    }
-
-    private fun nearestOrientation(degrees: Int): Int {
-        return when {
-            degrees < 45 || degrees >= 315 ->
-                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-            degrees < 135 ->
-                ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
-
-            degrees < 225 ->
-                ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
-
-            else ->
-                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        }
-    }
 
     companion object {
         private const val STABLE_TIME_MS = 380L

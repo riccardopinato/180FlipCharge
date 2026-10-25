@@ -7,7 +7,7 @@
     <string name="open_settings">Open settings</string>
     <string name="settings_eyebrow">PREFERENCES</string>
     <string name="settings_title">Settings</string>
-    <string name="settings_subtitle">Personalize 180FlipCharge without changing how rotation works.</string>
+    <string name="settings_subtitle">Personalize Rotate 180° without changing how rotation works.</string>
     <string name="language_title">Language</string>
     <string name="language_description">Choose the app language or let Android follow the device language.</string>
     <string name="language_system">Device language</string>
@@ -31,7 +31,7 @@
     <string name="grant_overlay_permission">ALLOW OVERLAY</string>
     <string name="grant_notification_permission">ALLOW NOTIFICATIONS</string>
     <string name="overlay_permission_title">Overlay access required</string>
-    <string name="overlay_permission_description">180FlipCharge needs permission to apply orientation control above other apps.</string>
+    <string name="overlay_permission_description">Rotate 180° needs permission to apply orientation control above other apps.</string>
     <string name="notification_permission_title">Notifications disabled</string>
     <string name="notification_permission_description">Allow notifications so Android can show the foreground rotation service when it is active.</string>
 
@@ -40,7 +40,7 @@
     <string name="app_exceptions_permission_missing">Usage access is required to apply these exceptions.</string>
     <string name="manage_app_exceptions">MANAGE APPS</string>
     <string name="app_exceptions_intro_title">Choose apps that should ignore 180°</string>
-    <string name="app_exceptions_intro_body">When one of these apps is in the foreground, 180FlipCharge temporarily restores normal orientation.</string>
+    <string name="app_exceptions_intro_body">When one of these apps is in the foreground, Rotate 180° temporarily restores normal orientation.</string>
     <string name="app_exceptions_none_selected">No app selected yet.</string>
     <string name="exceptions_eyebrow">APP CONTROL</string>
     <plurals name="app_exceptions_selected_count">
@@ -49,13 +49,13 @@
     </plurals>
 
     <string name="usage_access_title">Usage access required</string>
-    <string name="usage_access_description">This permission lets 180FlipCharge detect which app is currently open and apply your exceptions.</string>
+    <string name="usage_access_description">This permission lets Rotate 180° detect which app is currently open and apply your exceptions.</string>
     <string name="open_usage_access_settings">OPEN USAGE ACCESS</string>
     <string name="background_title">Background reliability</string>
     <string name="background_description">Review battery settings for more reliable continuous rotation control.</string>
     <string name="open_battery_settings">BATTERY SETTINGS</string>
 
-    <string name="tile_label">180FlipCharge</string>
+    <string name="tile_label">Rotate 180°</string>
     <string name="tile_force_180">180° fixed</string>
     <string name="tile_auto_180">Auto 180°</string>
     <string name="tile_charging">Charging</string>

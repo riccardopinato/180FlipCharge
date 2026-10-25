@@ -7,7 +7,7 @@
     <string name="open_settings">Abrir definições</string>
     <string name="settings_eyebrow">PREFERÊNCIAS</string>
     <string name="settings_title">Definições</string>
-    <string name="settings_subtitle">Personalize o 180FlipCharge sem alterar o funcionamento da rotação.</string>
+    <string name="settings_subtitle">Personalize o Rotate 180° sem alterar o funcionamento da rotação.</string>
     <string name="language_title">Idioma</string>
     <string name="language_description">Escolha o idioma da app ou deixe o Android seguir o idioma do dispositivo.</string>
     <string name="language_system">Idioma do dispositivo</string>
@@ -28,7 +28,7 @@
     <string name="grant_overlay_permission">PERMITIR SOBREPOSIÇÃO</string>
     <string name="grant_notification_permission">PERMITIR NOTIFICAÇÕES</string>
     <string name="overlay_permission_title">Acesso de sobreposição necessário</string>
-    <string name="overlay_permission_description">O 180FlipCharge precisa desta permissão para controlar a orientação sobre outras apps.</string>
+    <string name="overlay_permission_description">O Rotate 180° precisa desta permissão para controlar a orientação sobre outras apps.</string>
     <string name="notification_permission_title">Notificações desativadas</string>
     <string name="notification_permission_description">Permita notificações para que o Android mostre o serviço de rotação em primeiro plano quando estiver ativo.</string>
     <string name="app_exceptions_title">Exceções de apps</string>
@@ -36,17 +36,17 @@
     <string name="app_exceptions_permission_missing">É necessário acesso de utilização para aplicar estas exceções.</string>
     <string name="manage_app_exceptions">GERIR APPS</string>
     <string name="app_exceptions_intro_title">Escolha as apps que devem ignorar 180°</string>
-    <string name="app_exceptions_intro_body">Quando uma destas apps estiver em primeiro plano, o 180FlipCharge restaura temporariamente a orientação normal.</string>
+    <string name="app_exceptions_intro_body">Quando uma destas apps estiver em primeiro plano, o Rotate 180° restaura temporariamente a orientação normal.</string>
     <string name="app_exceptions_none_selected">Nenhuma app selecionada.</string>
     <string name="exceptions_eyebrow">CONTROLO DE APPS</string>
     <plurals name="app_exceptions_selected_count"><item quantity="one">%d app excluída</item><item quantity="other">%d apps excluídas</item></plurals>
     <string name="usage_access_title">Acesso de utilização necessário</string>
-    <string name="usage_access_description">Esta permissão permite ao 180FlipCharge detetar qual app está aberta e aplicar as exceções.</string>
+    <string name="usage_access_description">Esta permissão permite ao Rotate 180° detetar qual app está aberta e aplicar as exceções.</string>
     <string name="open_usage_access_settings">ABRIR ACESSO DE UTILIZAÇÃO</string>
     <string name="background_title">Fiabilidade em segundo plano</string>
     <string name="background_description">Reveja as definições de bateria para tornar o controlo contínuo da rotação mais fiável.</string>
     <string name="open_battery_settings">DEFINIÇÕES DE BATERIA</string>
-    <string name="tile_label">180FlipCharge</string>
+    <string name="tile_label">Rotate 180°</string>
     <string name="tile_force_180">180° fixo</string>
     <string name="tile_auto_180">Auto 180°</string>
     <string name="tile_charging">A carregar</string>
