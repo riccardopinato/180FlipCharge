@@ -16,7 +16,7 @@ val hasReleaseSigning = listOf(
 
 android {
     namespace = "com.flipcharge.app"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.flipcharge.app"
