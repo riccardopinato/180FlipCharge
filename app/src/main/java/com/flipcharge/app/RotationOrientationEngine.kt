@@ -2,6 +2,7 @@ package com.flipcharge.app
 
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.hardware.SensorManager
 import android.view.OrientationEventListener
 
 class RotationOrientationEngine(
@@ -16,7 +17,7 @@ class RotationOrientationEngine(
 
     private val listener = object : OrientationEventListener(
         context.applicationContext,
-        SENSOR_DELAY_NORMAL
+        SensorManager.SENSOR_DELAY_NORMAL
     ) {
         override fun onOrientationChanged(orientation: Int) {
             if (!enabled || orientation == ORIENTATION_UNKNOWN) return
