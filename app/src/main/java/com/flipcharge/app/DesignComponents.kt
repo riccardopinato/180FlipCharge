@@ -1,6 +1,7 @@
 package com.flipcharge.app
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,9 +22,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.flipcharge.app.ui.theme.FlipBlue
+import com.flipcharge.app.ui.theme.FlipPurple
+
+internal fun Modifier.flipGradientBorder(
+    shape: Shape,
+    width: androidx.compose.ui.unit.Dp = 1.25.dp,
+): Modifier = border(
+    width = width,
+    brush = Brush.linearGradient(listOf(FlipBlue, FlipPurple)),
+    shape = shape,
+)
 
 @Composable
 internal fun FlipHeroCard(
@@ -33,17 +46,21 @@ internal fun FlipHeroCard(
     active: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val shape = RoundedCornerShape(30.dp)
     val start = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
     val end = if (active) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surfaceVariant
 
     Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(30.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .flipGradientBorder(shape),
+        shape = shape,
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
             modifier = Modifier
+                .fillMaxWidth()
                 .background(Brush.linearGradient(listOf(start, end)))
                 .padding(horizontal = 22.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -108,11 +125,13 @@ internal fun FlipModeTile(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val shape = RoundedCornerShape(24.dp)
     Card(
         modifier = modifier
             .alpha(if (enabled) 1f else 0.52f)
+            .flipGradientBorder(shape)
             .clickable(enabled = enabled) { onCheckedChange(!checked) },
-        shape = RoundedCornerShape(24.dp),
+        shape = shape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
@@ -157,11 +176,13 @@ internal fun FlipActionCard(
     trailing: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
+    val shape = RoundedCornerShape(24.dp)
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .flipGradientBorder(shape)
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(24.dp),
+        shape = shape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {

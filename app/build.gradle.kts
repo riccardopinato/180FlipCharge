@@ -22,8 +22,8 @@ android {
         applicationId = "com.flipcharge.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 6
-        versionName = "0.6.0"
+        versionCode = 7
+        versionName = "0.6.1"
     }
 
     signingConfigs {
@@ -38,7 +38,7 @@ android {
     }
 
     androidResources {
-        localeFilters += listOf("en", "it")
+        localeFilters += listOf("en", "it", "es", "fr", "pt", "de")
     }
 
     buildFeatures {

@@ -5,9 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +18,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -23,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +52,8 @@ fun MainScreen(
     onPermanentAutoChange: (Boolean) -> Unit,
     onAutoChargeChange: (Boolean) -> Unit,
     onManageAppExceptions: () -> Unit,
-    onOpenBatterySettings: () -> Unit
+    onOpenBatterySettings: () -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -60,52 +66,73 @@ fun MainScreen(
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             item {
-                Column(
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, end = 12.dp, top = 18.dp, bottom = 4.dp),
+                    verticalAlignment = Alignment.Top,
                 ) {
-                    Text(
-                        text = stringResource(R.string.home_eyebrow),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.headlineLarge,
-                    )
-                    Text(
-                        text = stringResource(R.string.app_subtitle),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_eyebrow),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Text(
+                            text = stringResource(R.string.app_name),
+                            style = MaterialTheme.typography.headlineLarge,
+                        )
+                        Text(
+                            text = stringResource(R.string.app_subtitle),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+
+                    IconButton(onClick = onOpenSettings) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_settings),
+                            contentDescription = stringResource(R.string.open_settings),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
                 }
             }
 
             item {
-                val heroValue = when (state.effectiveMode) {
-                    ActiveRotationMode.FORCE_REVERSE_PORTRAIT -> "180°"
-                    ActiveRotationMode.PERMANENT_AUTO -> "AUTO+"
-                    ActiveRotationMode.OFF -> "0°"
-                }
-
-                val status = when (state.source) {
-                    ActivationSource.MANUAL -> stringResource(R.string.status_force_180)
-                    ActivationSource.CHARGING -> stringResource(R.string.status_charging)
-                    ActivationSource.PERMANENT_AUTO -> stringResource(R.string.status_permanent_auto)
-                    ActivationSource.NONE -> if (state.autoChargeEnabled) {
-                        stringResource(R.string.status_waiting_charge)
-                    } else {
-                        stringResource(R.string.status_off)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                ) {
+                    val heroValue = when (state.effectiveMode) {
+                        ActiveRotationMode.FORCE_REVERSE_PORTRAIT -> "180°"
+                        ActiveRotationMode.PERMANENT_AUTO -> "AUTO+"
+                        ActiveRotationMode.OFF -> "0°"
                     }
-                }
 
-                FlipHeroCard(
-                    value = heroValue,
-                    title = stringResource(R.string.hero_title),
-                    detail = status,
-                    active = state.active,
-                    modifier = Modifier.padding(horizontal = 20.dp),
-                )
+                    val status = when (state.source) {
+                        ActivationSource.MANUAL -> stringResource(R.string.status_force_180)
+                        ActivationSource.CHARGING -> stringResource(R.string.status_charging)
+                        ActivationSource.PERMANENT_AUTO -> stringResource(R.string.status_permanent_auto)
+                        ActivationSource.NONE -> if (state.autoChargeEnabled) {
+                            stringResource(R.string.status_waiting_charge)
+                        } else {
+                            stringResource(R.string.status_off)
+                        }
+                    }
+
+                    FlipHeroCard(
+                        value = heroValue,
+                        title = stringResource(R.string.hero_title),
+                        detail = status,
+                        active = state.active,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
 
             item {
@@ -113,7 +140,9 @@ fun MainScreen(
                     active = state.manualEnabled,
                     enabled = overlayPermissionGranted,
                     onClick = if (overlayPermissionGranted) onMainToggle else onRequestOverlayPermission,
-                    modifier = Modifier.padding(horizontal = 20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
                 )
             }
 
@@ -121,6 +150,7 @@ fun MainScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .height(IntrinsicSize.Max)
                         .padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
@@ -132,7 +162,9 @@ fun MainScreen(
                         checked = state.permanentAutoEnabled,
                         enabled = overlayPermissionGranted,
                         onCheckedChange = onPermanentAutoChange,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
                     )
                     FlipModeTile(
                         title = stringResource(R.string.auto_charge_title),
@@ -142,7 +174,9 @@ fun MainScreen(
                         checked = state.autoChargeEnabled,
                         enabled = overlayPermissionGranted,
                         onCheckedChange = onAutoChargeChange,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
                     )
                 }
             }
@@ -228,7 +262,6 @@ private fun PrimaryRotationAction(
 
     Box(
         modifier = modifier
-            .fillMaxWidth()
             .background(
                 brush = Brush.linearGradient(listOf(start, end)),
                 shape = RoundedCornerShape(22.dp),
@@ -259,11 +292,13 @@ private fun PermissionCard(
     accent: androidx.compose.ui.graphics.Color,
     onClick: () -> Unit,
 ) {
+    val shape = RoundedCornerShape(24.dp)
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        shape = RoundedCornerShape(24.dp),
+            .padding(horizontal = 20.dp)
+            .flipGradientBorder(shape),
+        shape = shape,
         colors = CardDefaults.cardColors(containerColor = accent.copy(alpha = 0.10f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
