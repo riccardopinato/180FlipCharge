@@ -5,7 +5,7 @@ Lightweight Android utility that adds reliable reverse portrait / 180° rotation
 ## Current baseline
 
 - Package: `com.flipcharge.app`
-- Version: `0.5.0` (`versionCode 5`)
+- Version: `0.6.0` (`versionCode 6`)
 - Native Kotlin + Jetpack Compose
 - Android `minSdk 26`, `targetSdk 36`
 - Manual fixed 180° mode
