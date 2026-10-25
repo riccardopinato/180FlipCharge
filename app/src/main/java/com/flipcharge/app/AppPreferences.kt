@@ -76,6 +76,15 @@ class AppPreferences(context: Context) {
     fun setChargingSuppressed(value: Boolean) =
         prefs.edit().putBoolean(KEY_CHARGING_SUPPRESSED, value).apply()
 
+    fun disableAll() {
+        prefs.edit()
+            .putBoolean(KEY_MANUAL, false)
+            .putBoolean(KEY_PERMANENT_AUTO, false)
+            .putBoolean(KEY_AUTO_CHARGE, false)
+            .putBoolean(KEY_CHARGING_SUPPRESSED, false)
+            .apply()
+    }
+
     fun updateChargingState(charging: Boolean) {
         val editor = prefs.edit().putBoolean(KEY_CHARGING_NOW, charging)
         if (!charging) editor.putBoolean(KEY_CHARGING_SUPPRESSED, false)

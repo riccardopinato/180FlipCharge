@@ -26,6 +26,7 @@ class SettingsActivity : LocalizedActivity() {
 
                         AppLocaleManager.setLanguage(this, languageCode)
                         selectedLanguage.value = languageCode
+                        RotationController.reconcileService(this)
 
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                             recreate()
