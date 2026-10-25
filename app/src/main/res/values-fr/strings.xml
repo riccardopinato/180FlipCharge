@@ -7,7 +7,7 @@
     <string name="open_settings">Ouvrir les paramètres</string>
     <string name="settings_eyebrow">PRÉFÉRENCES</string>
     <string name="settings_title">Paramètres</string>
-    <string name="settings_subtitle">Personnalisez 180FlipCharge sans modifier le fonctionnement de la rotation.</string>
+    <string name="settings_subtitle">Personnalisez Rotate 180° sans modifier le fonctionnement de la rotation.</string>
     <string name="language_title">Langue</string>
     <string name="language_description">Choisissez la langue de l’app ou laissez Android suivre la langue de l’appareil.</string>
     <string name="language_system">Langue de l’appareil</string>
@@ -28,7 +28,7 @@
     <string name="grant_overlay_permission">AUTORISER LA SUPERPOSITION</string>
     <string name="grant_notification_permission">AUTORISER LES NOTIFICATIONS</string>
     <string name="overlay_permission_title">Accès à la superposition requis</string>
-    <string name="overlay_permission_description">180FlipCharge a besoin de cette autorisation pour contrôler l’orientation au-dessus des autres apps.</string>
+    <string name="overlay_permission_description">Rotate 180° a besoin de cette autorisation pour contrôler l’orientation au-dessus des autres apps.</string>
     <string name="notification_permission_title">Notifications désactivées</string>
     <string name="notification_permission_description">Autorisez les notifications afin qu’Android puisse afficher le service de rotation actif.</string>
     <string name="app_exceptions_title">Exceptions d’apps</string>
@@ -36,17 +36,17 @@
     <string name="app_exceptions_permission_missing">L’accès à l’utilisation est requis pour appliquer ces exceptions.</string>
     <string name="manage_app_exceptions">GÉRER LES APPS</string>
     <string name="app_exceptions_intro_title">Choisissez les apps qui doivent ignorer 180°</string>
-    <string name="app_exceptions_intro_body">Lorsqu’une de ces apps est au premier plan, 180FlipCharge rétablit temporairement l’orientation normale.</string>
+    <string name="app_exceptions_intro_body">Lorsqu’une de ces apps est au premier plan, Rotate 180° rétablit temporairement l’orientation normale.</string>
     <string name="app_exceptions_none_selected">Aucune app sélectionnée.</string>
     <string name="exceptions_eyebrow">CONTRÔLE DES APPS</string>
     <plurals name="app_exceptions_selected_count"><item quantity="one">%d app exclue</item><item quantity="other">%d apps exclues</item></plurals>
     <string name="usage_access_title">Accès à l’utilisation requis</string>
-    <string name="usage_access_description">Cette autorisation permet à 180FlipCharge de détecter l’app ouverte et d’appliquer vos exceptions.</string>
+    <string name="usage_access_description">Cette autorisation permet à Rotate 180° de détecter l’app ouverte et d’appliquer vos exceptions.</string>
     <string name="open_usage_access_settings">OUVRIR L’ACCÈS À L’UTILISATION</string>
     <string name="background_title">Fiabilité en arrière-plan</string>
     <string name="background_description">Vérifiez les réglages de batterie pour rendre le contrôle continu de la rotation plus fiable.</string>
     <string name="open_battery_settings">RÉGLAGES DE BATTERIE</string>
-    <string name="tile_label">180FlipCharge</string>
+    <string name="tile_label">Rotate 180°</string>
     <string name="tile_force_180">180° fixe</string>
     <string name="tile_auto_180">Auto 180°</string>
     <string name="tile_charging">En charge</string>

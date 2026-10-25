@@ -22,8 +22,8 @@ android {
         applicationId = "com.flipcharge.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 8
-        versionName = "0.7.0"
+        versionCode = 9
+        versionName = "0.7.1"
     }
 
     signingConfigs {
@@ -91,7 +91,7 @@ dependencies {
 
 tasks.register("checkReleaseSize") {
     group = "verification"
-    description = "Fails when 180FlipCharge release artifacts exceed the size budget."
+    description = "Fails when Rotate 180° release artifacts exceed the size budget."
     dependsOn("assembleRelease", "bundleRelease")
 
     doLast {
@@ -102,7 +102,7 @@ tasks.register("checkReleaseSize") {
             ?: error("Release APK not found in ${apkDir.absolutePath}")
 
         val apkLimit = 8L * 1024L * 1024L
-        println("180FlipCharge release APK: %.2f MiB".format(apk.length().toDouble() / 1024.0 / 1024.0))
+        println("Rotate 180° release APK: %.2f MiB".format(apk.length().toDouble() / 1024.0 / 1024.0))
         check(apk.length() <= apkLimit) {
             "Release APK exceeds 8 MiB budget: ${apk.length()} bytes"
         }
@@ -114,7 +114,7 @@ tasks.register("checkReleaseSize") {
             ?: error("Release AAB not found in ${aabDir.absolutePath}")
 
         val aabLimit = 10L * 1024L * 1024L
-        println("180FlipCharge release AAB: %.2f MiB".format(aab.length().toDouble() / 1024.0 / 1024.0))
+        println("Rotate 180° release AAB: %.2f MiB".format(aab.length().toDouble() / 1024.0 / 1024.0))
         check(aab.length() <= aabLimit) {
             "Release AAB exceeds 10 MiB budget: ${aab.length()} bytes"
         }

@@ -11,7 +11,7 @@ This file intentionally keeps deferred publication work visible.
 - [ ] Usage Access revoke/regrant
 - [ ] Quick Settings Tile
 - [ ] Charging connect/disconnect
-- [ ] Permanent Auto 0/90/180/270
+- [ ] Permanent Auto switches only 0° ↔ 180° and never enters 90° / 270°
 - [ ] App Exceptions with app kept foreground > 5 minutes
 - [ ] Screen off/on
 - [ ] Battery Saver / OEM restrictions

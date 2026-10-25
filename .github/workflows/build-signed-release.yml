@@ -104,8 +104,8 @@ jobs:
           fi
 
           mkdir -p release-artifacts
-          cp "$APK" release-artifacts/Rotate-180-v0.7.0-internal.apk
-          cp "$AAB" release-artifacts/Rotate-180-v0.7.0-internal.aab
+          cp "$APK" release-artifacts/Rotate-180-v0.7.1-internal.apk
+          cp "$AAB" release-artifacts/Rotate-180-v0.7.1-internal.aab
           sha256sum release-artifacts/*.apk release-artifacts/*.aab > release-artifacts/SHA256SUMS.txt
           printf 'source_sha=%s\nworkflow_run=%s\ncertificate_sha256=%s\n' \
             "$GITHUB_SHA" "$GITHUB_RUN_ID" "$EXPECTED" > release-artifacts/RELEASE_EVIDENCE.txt
@@ -113,23 +113,23 @@ jobs:
       - name: Upload signed APK
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: 180FlipCharge-signed-apk
-          path: release-artifacts/Rotate-180-v0.7.0-internal.apk
+          name: Rotate-180-signed-apk
+          path: release-artifacts/Rotate-180-v0.7.1-internal.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Upload signed AAB
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: 180FlipCharge-signed-aab
-          path: release-artifacts/Rotate-180-v0.7.0-internal.aab
+          name: Rotate-180-signed-aab
+          path: release-artifacts/Rotate-180-v0.7.1-internal.aab
           if-no-files-found: error
           retention-days: 30
 
       - name: Upload release evidence
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: 180FlipCharge-release-evidence
+          name: Rotate-180-release-evidence
           path: |
             release-artifacts/SHA256SUMS.txt
             release-artifacts/RELEASE_EVIDENCE.txt
