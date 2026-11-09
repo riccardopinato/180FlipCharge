@@ -33,3 +33,8 @@ GitHub Actions is the canonical build path. `Development checks` validates test/
 ## Factory baseline
 
 App Factory Core baseline used for this fix: `1b4d39a558bff76d08ea7ccc1ce44d6cdb398e1e`.
+
+
+## Template Notion
+
+[Catalogo di ricerca](docs/TEMPLATE_NOTION/README.md): nessun template assegnato in questa fase.
