@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -83,11 +82,7 @@ private val manualShape = RoundedCornerShape(21.dp)
 private val modeShape = RoundedCornerShape(17.dp)
 
 private val heroSurface = Brush.linearGradient(
-    colorStops = arrayOf(
-        0.0f to Color(0xFF24343A),
-        0.55f to Color(0xFF17262C),
-        1.0f to Color(0xFF111B22),
-    ),
+    listOf(Color(0xFF24343A), Color(0xFF17262C), Color(0xFF111B22)),
 )
 private val controlSurface = Brush.linearGradient(
     listOf(Color(0xFF25353A), Color(0xFF162329), Color(0xFF101C22)),
