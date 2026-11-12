@@ -1,7 +1,6 @@
 package com.flipcharge.app
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -24,8 +23,7 @@ class SettingsActivity : LocalizedActivity() {
                     selectedLanguage = selectedLanguage.value,
                     onBack = { finish() },
                     onOpenPrivacyPolicy = {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(PRIVACY_POLICY_URL))
-                        runCatching { startActivity(intent) }
+                        startActivity(Intent(this, PrivacyPolicyActivity::class.java))
                     },
                     onLanguageSelected = { languageCode ->
                         if (languageCode == selectedLanguage.value) return@SettingsScreen
@@ -41,8 +39,5 @@ class SettingsActivity : LocalizedActivity() {
                 )
             }
         }
-    }
-    companion object {
-        private const val PRIVACY_POLICY_URL = "https://rotate180-privacy.vercel.app/"
     }
 }

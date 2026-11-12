@@ -183,7 +183,7 @@ fun SettingsScreen(
                                 style = MaterialTheme.typography.titleMedium,
                             )
                             Text(
-                                text = "↗",
+                                text = "›",
                                 color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.titleLarge,
                             )

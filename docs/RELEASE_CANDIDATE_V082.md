@@ -23,3 +23,14 @@
 
 ## No-Go gate
 Publishing paid production remains blocked until FGS permission justification, device testing and Console declarations are recorded with evidence and no P0/P1 failures remain.
+
+
+## v0.8.3 follow-up (internal privacy screen only)
+
+- Native non-exported PrivacyPolicyActivity, launched from Settings.
+- Entire seven-section IT/EN disclosure available offline in scrollable Neo Tactile Dark Compose UI; other app locales default to English policy text.
+- External public policy and GitHub contact are optional links from the offline screen.
+- Settings button now presents an internal chevron, not external-link indicator.
+- Same existing permissions, package and rotation engine. versionCode 13.
+- Public HTML policy updates remove stale reference to v0.8.1, keeping current wording aligned.
+- This is NOT proof of final publisher legal name, Google Play Data Safety approval or user-device test.
