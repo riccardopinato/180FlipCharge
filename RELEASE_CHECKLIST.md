@@ -65,14 +65,14 @@ Before changing PASS, append: tester, UTC date, device/Android build if applicab
 |---|---|---|---|---|---|
 | EXTRA-01 | Compatibility | Update in place | **P0** | DEVICE | PENDING |
 | EXTRA-02 | Signing | Play App Signing setup | **P0** | CONSOLE | PENDING |
-| EXTRA-03 | Accuracy | Correct 90°/270° misleading text | **P0** | STATIC | PENDING |
+| EXTRA-03 | Accuracy | Correct 90°/270° misleading text | **P0** | STATIC | FAIL |
 | EXTRA-04 | Privacy | Local data backup behavior | **P0** | DEVICE | PENDING |
 | EXTRA-05 | Privacy | Network/data flows and SDKs | **P0** | STATIC | PENDING |
 | EXTRA-06 | Console | App creation, account eligibility and payments | **P0** | CONSOLE | PENDING |
 | EXTRA-07 | Console | Closed testing eligibility | **P0** | CONSOLE | PENDING |
 | EXTRA-08 | Console | App content declarations | **P0** | CONSOLE | PENDING |
 | EXTRA-09 | Store assets | Listing artwork spec | **P1** | CONSOLE | PENDING |
-| EXTRA-10 | Documentation | README version and feature correctness | **P1** | STATIC | PENDING |
+| EXTRA-10 | Documentation | README version and feature correctness | **P1** | STATIC | FAIL |
 | EXTRA-11 | Visual QA | Native UI parity with approved V2 web | **P1** | DEVICE | PENDING |
 | EXTRA-12 | Accessibility | Permissions/notification with notifications denied | **P0** | DEVICE | PENDING |
 | EXTRA-13 | Privacy | Public privacy URL and in-app link | **P0** | CONSOLE | PENDING |
