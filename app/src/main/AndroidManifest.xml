@@ -44,6 +44,10 @@
             android:name=".SettingsActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".PrivacyPolicyActivity"
+            android:exported="false" />
+
         <service
             android:name=".ReversePortraitService"
             android:exported="false"

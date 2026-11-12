@@ -6,7 +6,7 @@ Lightweight Android utility that adds reliable reverse portrait / 180° rotation
 
 - Display name: `Rotate 180°`
 - Legacy package identity: `com.flipcharge.app`
-- Version: `0.8.2` (`versionCode 12`)
+- Version: `0.8.3` (`versionCode 13`)
 - Native Kotlin + Jetpack Compose
 - Android `minSdk 26`, `targetSdk 36`
 - Manual fixed 180° mode
@@ -33,7 +33,7 @@ GitHub Actions is the canonical build path. `Development checks` validates test/
 ## Google Play release readiness
 
 - Production remains **NO-GO** until device QA and Play Console review.
-- [Privacy Policy](https://rotate180-privacy.vercel.app/) (IT/EN, publisher identity and contact pending final verification).
+- **Privacy Policy in-app**: Settings → Privacy Policy opens a dedicated offline native Compose screen (IT/EN), with optional online version and contact; [public policy](https://rotate180-privacy.vercel.app/) remains available for Play. Publisher legal identity/contact pending final verification.
 - [48-item audit checklist](RELEASE_CHECKLIST.md) and [test runbook](docs/PREPUBLICATION_AUDIT_V081_2026-11-12.md).
 - The Auto 180° orientation engine supports **upright 0° and reverse portrait 180° only**; never promises landscape modes.
 - [Store listing drafts](store/listings/) and [ASO asset plan](store/ASSETS_SPEC.md) — not Play-approved.
