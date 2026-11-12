@@ -1,0 +1,87 @@
+name: Publish direct APK download
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: direct-apk-v083
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish-apk]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout for provenance
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Download verified signed v0.8.3 artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p distribution
+          gh run download 43311222983 -R "$GITHUB_REPOSITORY" -n Rotate-180-signed-apk -D distribution
+          gh run download 43311222983 -R "$GITHUB_REPOSITORY" -n Rotate-180-release-evidence -D distribution
+          test -s distribution/Rotate-180-v0.8.3-internal.apk
+          test -s distribution/SHA256SUMS.txt
+          test -s distribution/RELEASE_EVIDENCE.txt
+
+      - name: Verify source, signer and APK SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED="d2d4bafeb869a0bd5fa45095293111ae37da851dc066f4d6bb9da64498fdbcc4"
+          CERT="1d4be8f08662b151779c5495288d8d8d168231fcfd27044e33b3746ec1c17948"
+          grep -Fxq "source_sha=05bc1e2a13f37563ec1ee52874855a8b52d168b1" distribution/RELEASE_EVIDENCE.txt
+          grep -Fxq "workflow_run=43311222983" distribution/RELEASE_EVIDENCE.txt
+          grep -Fxq "certificate_sha256=$CERT" distribution/RELEASE_EVIDENCE.txt
+          grep -Fxq "$EXPECTED  release-artifacts/Rotate-180-v0.8.3-internal.apk" distribution/SHA256SUMS.txt
+          printf '%s  %s\n' "$EXPECTED" "distribution/Rotate-180-v0.8.3-internal.apk" | sha256sum -c -
+          test "$(stat -c '%s' distribution/Rotate-180-v0.8.3-internal.apk)" -eq 1181087
+
+      - name: Publish public GitHub prerelease with direct APK asset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > distribution/RELEASE_NOTES.md <<'EOF'
+          # Rotate 180° v0.8.3 — APK per test
+
+          Scarica Rotate-180-v0.8.3-internal.apk nella sezione Assets. È direttamente installabile su Android, senza estrarre ZIP.
+
+          VersionCode: 13. Package: com.flipcharge.app. Requisito: Android 8+.
+          Include la Privacy Policy interna e offline in italiano e inglese, con stile Neo Tactile Dark.
+
+          SHA-256: d2d4bafeb869a0bd5fa45095293111ae37da851dc066f4d6bb9da64498fdbcc4
+          Build firmata sorgente: commit 05bc1e2a13f37563ec1ee52874855a8b52d168b1, GitHub Actions run 43311222983.
+          Questa è una prerelease di test, non una pubblicazione Google Play approvata.
+          Non disinstallare l'app esistente se vuoi mantenere le impostazioni: aggiorna soltanto se la firma corrisponde.
+          EOF
+
+          TAG="v0.8.3-apk-test"
+          if gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::Release already exists; refusing to overwrite"
+            exit 1
+          fi
+
+          gh release create "$TAG" \
+            distribution/Rotate-180-v0.8.3-internal.apk \
+            distribution/SHA256SUMS.txt \
+            distribution/RELEASE_EVIDENCE.txt \
+            -R "$GITHUB_REPOSITORY" \
+            --target 05bc1e2a13f37563ec1ee52874855a8b52d168b1 \
+            --title "Rotate 180° v0.8.3 — APK test diretto" \
+            --notes-file distribution/RELEASE_NOTES.md \
+            --prerelease \
+            --latest=false
+          gh release view "$TAG" -R "$GITHUB_REPOSITORY" --json url,assets,isDraft,isPrerelease
