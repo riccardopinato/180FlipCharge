@@ -1,9 +1,7 @@
 package com.flipcharge.app
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,17 +19,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.flipcharge.app.ui.theme.Manrope
+import com.flipcharge.app.ui.theme.SpaceGrotesk
 
-/**
- * Approved Neo Tactile Dark consumer home, derived from the v2 interactive
- * design preview. Only presentation changed; all callbacks retain their
- * original native Android implementations and data owner.
- */
+/** Android-native production screen faithful to approved V2 web phone preview. */
 @Composable
 fun MainScreen(
     state: FlipState,
@@ -50,116 +49,168 @@ fun MainScreen(
     onOpenBatterySettings: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
+    val tone = when {
+        !overlayPermissionGranted -> NeoRuntimeTone.PERMISSION
+        runtimeHealth == RuntimeHealth.MISSING_OVERLAY_PERMISSION -> NeoRuntimeTone.PERMISSION
+        runtimeHealth == RuntimeHealth.OVERLAY_ERROR ||
+            runtimeHealth == RuntimeHealth.SENSOR_UNAVAILABLE ||
+            runtimeHealth == RuntimeHealth.SERVICE_START_BLOCKED ||
+            runtimeHealth == RuntimeHealth.SERVICE_STOPPED -> NeoRuntimeTone.ERROR
+        runtimeHealth == RuntimeHealth.STARTING -> NeoRuntimeTone.STARTING
+        runtimeHealth == RuntimeHealth.WAITING_CHARGER -> NeoRuntimeTone.WAITING
+        runtimeHealth == RuntimeHealth.SUSPENDED_APP_EXCEPTION ||
+            runtimeHealth == RuntimeHealth.SUSPENDED_SCREEN_OFF -> NeoRuntimeTone.PAUSED
+        state.active && runtimeHealth.isOperational -> NeoRuntimeTone.ACTIVE
+        else -> NeoRuntimeTone.INACTIVE
+    }
+
+    val modeLabel = when (tone) {
+        NeoRuntimeTone.PERMISSION -> stringResource(R.string.neo_mode_permission)
+        NeoRuntimeTone.ERROR -> stringResource(R.string.neo_mode_error)
+        NeoRuntimeTone.STARTING -> stringResource(R.string.neo_mode_starting)
+        NeoRuntimeTone.PAUSED -> stringResource(R.string.neo_mode_paused)
+        NeoRuntimeTone.WAITING -> stringResource(R.string.neo_mode_waiting)
+        NeoRuntimeTone.INACTIVE -> stringResource(R.string.neo_mode_standby)
+        NeoRuntimeTone.ACTIVE -> when (state.source) {
+            ActivationSource.MANUAL -> stringResource(R.string.neo_mode_manual)
+            ActivationSource.CHARGING -> stringResource(R.string.neo_mode_charging)
+            ActivationSource.PERMANENT_AUTO -> stringResource(R.string.neo_mode_auto)
+            ActivationSource.NONE -> stringResource(R.string.neo_mode_standby)
+        }
+    }
+    val stateLabel = when (tone) {
+        NeoRuntimeTone.ACTIVE -> stringResource(R.string.neo_state_active)
+        NeoRuntimeTone.INACTIVE -> stringResource(R.string.neo_state_inactive)
+        NeoRuntimeTone.WAITING -> stringResource(R.string.neo_state_waiting)
+        NeoRuntimeTone.ERROR -> stringResource(R.string.neo_state_error)
+        NeoRuntimeTone.PERMISSION -> stringResource(R.string.neo_state_permission)
+        NeoRuntimeTone.STARTING -> stringResource(R.string.neo_state_starting)
+        NeoRuntimeTone.PAUSED -> stringResource(R.string.neo_state_paused)
+    }
+    val heroValue = when (state.effectiveMode) {
+        ActiveRotationMode.FORCE_REVERSE_PORTRAIT -> "180°"
+        ActiveRotationMode.PERMANENT_AUTO -> "AUTO+"
+        ActiveRotationMode.OFF -> "0°"
+    }
+
     Scaffold(containerColor = NeoPalette.Background) { insets ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(NeoPalette.Background)
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xFF101A1F), NeoPalette.Background, NeoPalette.Background),
+                    ),
+                )
                 .padding(insets),
             contentPadding = PaddingValues(
                 start = 20.dp,
                 end = 20.dp,
-                top = 20.dp,
-                bottom = 34.dp,
+                top = 17.dp,
+                bottom = 26.dp,
             ),
-            verticalArrangement = Arrangement.spacedBy(17.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Column(
                         modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(7.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text(
-                            text = stringResource(R.string.home_eyebrow),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = NeoPalette.Teal,
+                            text = stringResource(R.string.neo_header_eyebrow),
+                            fontFamily = Manrope,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.5.sp,
+                            fontSize = 10.sp,
+                            lineHeight = 14.sp,
+                            color = Color(0xFF75C9BD),
                         )
                         Text(
                             text = stringResource(R.string.app_name),
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = NeoPalette.Ink,
+                            fontFamily = SpaceGrotesk,
+                            fontSize = 25.sp,
+                            lineHeight = 27.sp,
+                            letterSpacing = (-1).sp,
                             fontWeight = FontWeight.Bold,
+                            color = NeoPalette.Ink,
                         )
                     }
-
                     IconButton(
                         onClick = onOpenSettings,
                         modifier = Modifier.neoSmallPanel(),
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_settings),
+                            tint = Color(0xFFBBCFD0),
                             contentDescription = stringResource(R.string.open_settings),
-                            tint = NeoPalette.Ink,
                         )
                     }
                 }
             }
 
             item {
-                val heroValue = when (state.effectiveMode) {
-                    ActiveRotationMode.FORCE_REVERSE_PORTRAIT -> "180°"
-                    ActiveRotationMode.PERMANENT_AUTO -> "AUTO+"
-                    ActiveRotationMode.OFF -> "0°"
-                }
-                val operational = state.active && runtimeHealth.isOperational
-                val isWaiting = runtimeHealth == RuntimeHealth.WAITING_CHARGER
-                val hasIssue = runtimeHealth in setOf(
-                    RuntimeHealth.MISSING_OVERLAY_PERMISSION,
-                    RuntimeHealth.OVERLAY_ERROR,
-                    RuntimeHealth.SENSOR_UNAVAILABLE,
-                    RuntimeHealth.SERVICE_START_BLOCKED,
-                    RuntimeHealth.SERVICE_STOPPED,
-                )
                 NeoHeroCard(
                     value = heroValue,
-                    title = stringResource(R.string.hero_title),
+                    title = stringResource(R.string.neo_hero_heading),
                     detail = runtimeHealthLabel(runtimeHealth, state),
-                    operational = operational,
-                    waiting = isWaiting,
-                    issue = hasIssue,
+                    modeLabel = modeLabel,
+                    stateLabel = stateLabel,
+                    engineLabel = stringResource(R.string.neo_state_engine),
+                    modeEyebrow = stringResource(R.string.neo_mode_title),
+                    dialDescription = stringResource(R.string.neo_accessibility_dial),
+                    tone = tone,
                 )
             }
 
             item {
-                NeoSectionHeader(text = stringResource(R.string.enable_forced_180))
-                Spacer(Modifier.height(10.dp))
-                NeoManualControl(
-                    title = stringResource(R.string.enable_forced_180),
-                    detail = stringResource(R.string.status_force_180),
-                    checked = state.manualEnabled,
-                    permissionGranted = overlayPermissionGranted,
-                    onToggle = {
-                        if (overlayPermissionGranted) {
-                            onMainToggle()
-                        } else {
-                            onRequestOverlayPermission()
-                        }
-                    },
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(11.dp)) {
+                    NeoSectionHeader(
+                        title = stringResource(R.string.neo_section_manual),
+                        index = stringResource(R.string.neo_section_manual_index),
+                    )
+                    NeoManualControl(
+                        eyebrow = stringResource(R.string.neo_manual_overline),
+                        title = stringResource(R.string.neo_manual_title),
+                        subtitle = stringResource(R.string.neo_manual_description),
+                        onState = stringResource(R.string.neo_manual_active),
+                        offState = stringResource(R.string.neo_manual_inactive),
+                        checked = state.manualEnabled,
+                        permissionGranted = overlayPermissionGranted,
+                        onToggle = {
+                            if (overlayPermissionGranted) {
+                                onMainToggle()
+                            } else {
+                                onRequestOverlayPermission()
+                            }
+                        },
+                    )
+                }
             }
 
             item {
-                NeoSectionHeader(text = stringResource(R.string.permanent_180_title))
-                Spacer(Modifier.height(10.dp))
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    NeoSectionHeader(
+                        title = stringResource(R.string.neo_section_automation),
+                        index = stringResource(R.string.neo_section_automation_index),
+                    )
                     NeoModeRow(
                         title = stringResource(R.string.permanent_180_title),
-                        subtitle = stringResource(R.string.permanent_180_short),
-                        glyph = "↻",
+                        subtitle = stringResource(R.string.neo_auto_description),
+                        glyph = NeoModeGlyph.ROTATE,
                         accent = NeoPalette.Teal,
                         checked = state.permanentAutoEnabled,
                         enabled = overlayPermissionGranted,
                         onCheckedChange = onPermanentAutoChange,
                     )
                     NeoModeRow(
-                        title = stringResource(R.string.auto_charge_title),
-                        subtitle = stringResource(R.string.auto_charge_short),
-                        glyph = "ϟ",
+                        title = stringResource(R.string.neo_charging_title),
+                        subtitle = stringResource(R.string.neo_charging_description),
+                        glyph = NeoModeGlyph.CHARGING,
                         accent = NeoPalette.Amber,
                         checked = state.autoChargeEnabled,
                         enabled = overlayPermissionGranted,
@@ -178,7 +229,6 @@ fun MainScreen(
                     )
                 }
             }
-
             if (showNotificationPermission && !notificationPermissionGranted) {
                 item {
                     NeoPermissionCard(
@@ -191,33 +241,36 @@ fun MainScreen(
             }
 
             item {
-                val subtitle = if (excludedAppsCount == 0) {
-                    stringResource(R.string.app_exceptions_description_empty)
-                } else {
+                val excludedSubtitle = if (excludedAppsCount > 0) {
                     pluralStringResource(
                         R.plurals.app_exceptions_selected_count,
                         excludedAppsCount,
                         excludedAppsCount,
                     )
+                } else {
+                    stringResource(R.string.neo_exceptions_description)
                 }
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    NeoSectionHeader(
+                        title = stringResource(R.string.neo_section_tools),
+                        index = stringResource(R.string.neo_section_tools_index),
+                    )
                     NeoUtilityRow(
                         title = stringResource(R.string.app_exceptions_title),
-                        subtitle = subtitle,
-                        glyph = "▣",
-                        onClick = onManageAppExceptions,
+                        subtitle = excludedSubtitle,
+                        glyph = NeoUtilityGlyph.APPS,
                         attention = excludedAppsCount > 0 && !usageAccessGranted,
+                        onClick = onManageAppExceptions,
                     )
                     NeoUtilityRow(
                         title = stringResource(R.string.background_title),
-                        subtitle = stringResource(R.string.background_description),
-                        glyph = "◎",
+                        subtitle = stringResource(R.string.neo_background_description),
+                        glyph = NeoUtilityGlyph.BATTERY,
                         onClick = onOpenBatterySettings,
                     )
                 }
             }
-
-            item { Spacer(Modifier.height(4.dp)) }
+            item { Spacer(Modifier.height(3.dp)) }
         }
     }
 }

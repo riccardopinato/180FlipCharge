@@ -69,4 +69,43 @@
     <string name="runtime_suspended_exception">Pausiert wegen der aktuellen App-Ausnahme</string>
     <string name="runtime_screen_off">Pausiert, solange der Bildschirm ausgeschaltet ist</string>
     <string name="runtime_starting">Rotationssteuerung wird gestartet…</string>
+
+    <!-- Neo Tactile Dark UI v0.8.1: localized preview-equivalent text -->
+    <string name="neo_header_eyebrow">ANZEIGE / STEUERUNG</string>
+    <string name="neo_hero_heading">AKTUELLE AUSRICHTUNG</string>
+    <string name="neo_section_manual">HAUPTSTEUERUNG</string>
+    <string name="neo_section_manual_index">01 — MANUELL</string>
+    <string name="neo_section_automation">AUTOMATIK</string>
+    <string name="neo_section_automation_index">02 — MODI</string>
+    <string name="neo_section_tools">WERKZEUGE</string>
+    <string name="neo_section_tools_index">03 — EINSTELLUNGEN</string>
+    <string name="neo_manual_overline">ROTATE / 180°</string>
+    <string name="neo_manual_title">180° erzwingen</string>
+    <string name="neo_manual_description">Festes umgekehrtes Hochformat.</string>
+    <string name="neo_manual_active">Steuerung aktiv</string>
+    <string name="neo_manual_inactive">Steuerung inaktiv</string>
+    <string name="neo_auto_description">Erweiterte automatische Drehung</string>
+    <string name="neo_charging_title">Beim Laden</string>
+    <string name="neo_charging_description">180° bei Stromanschluss</string>
+    <string name="neo_exceptions_description">Bestimmte Apps von Drehung ausnehmen</string>
+    <string name="neo_background_description">Akkuoptimierung und Dienste</string>
+    <string name="neo_state_active">AKTIV</string>
+    <string name="neo_state_inactive">INAKTIV</string>
+    <string name="neo_state_waiting">WARTEN</string>
+    <string name="neo_state_error">FEHLER</string>
+    <string name="neo_state_permission">BERECHTIGUNG</string>
+    <string name="neo_state_starting">START</string>
+    <string name="neo_state_paused">PAUSE</string>
+    <string name="neo_state_engine">ROTATION ENGINE</string>
+    <string name="neo_mode_title">MODUS</string>
+    <string name="neo_mode_standby">STANDBY / 00</string>
+    <string name="neo_mode_manual">MANUAL / 180</string>
+    <string name="neo_mode_charging">POWER / 180</string>
+    <string name="neo_mode_auto">AUTO / ACTIVE</string>
+    <string name="neo_mode_waiting">POWER / WAIT</string>
+    <string name="neo_mode_error">ERROR / SERVICE</string>
+    <string name="neo_mode_permission">ACCESS / REQUIRED</string>
+    <string name="neo_mode_starting">STARTING / SERVICE</string>
+    <string name="neo_mode_paused">PAUSED / SERVICE</string>
+    <string name="neo_accessibility_dial">Visuelle Drehanzeige</string>
 </resources>
