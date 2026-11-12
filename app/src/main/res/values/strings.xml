@@ -22,8 +22,8 @@
     <string name="status_waiting_charge">Ready — waiting for charger</string>
 
     <string name="permanent_180_title">Auto 180°</string>
-    <string name="permanent_180_description">Extends automatic rotation to 0°, 90°, 180° and 270° and stays active in the background.</string>
-    <string name="permanent_180_short">0°, 90°, 180° and 270° automatically</string>
+    <string name="permanent_180_description">Automatically switches between upright (0°) and upside-down portrait (180°). Does not enter landscape mode.</string>
+    <string name="permanent_180_short">Automatically switches between 0° and 180° portrait.</string>
     <string name="auto_charge_title">Charging</string>
     <string name="auto_charge_description">Force 180° while power is connected, then return to the previous mode when unplugged.</string>
     <string name="auto_charge_short">Flip automatically when power is connected</string>
@@ -49,7 +49,7 @@
     </plurals>
 
     <string name="usage_access_title">Usage access required</string>
-    <string name="usage_access_description">This permission lets Rotate 180° detect which app is currently open and apply your exceptions.</string>
+    <string name="usage_access_description">Usage Access lets Rotate 180° check which app is open to apply your chosen exclusions. The selected apps are stored on this device; usage information is not sent to an app server.</string>
     <string name="open_usage_access_settings">OPEN USAGE ACCESS</string>
     <string name="background_title">Background reliability</string>
     <string name="background_description">Review battery settings for more reliable continuous rotation control.</string>
@@ -117,4 +117,6 @@
     <string name="neo_mode_starting">STARTING / SERVICE</string>
     <string name="neo_mode_paused">PAUSED / SERVICE</string>
     <string name="neo_accessibility_dial">Visual rotation status dial</string>
+    <string name="privacy_policy_title">Privacy Policy</string>
+    <string name="privacy_policy_description">Learn how permissions, app exclusions and local settings are handled.</string>
 </resources>

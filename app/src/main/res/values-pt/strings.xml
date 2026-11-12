@@ -20,8 +20,8 @@
     <string name="status_permanent_auto">Auto + 180° permanente ativo</string>
     <string name="status_waiting_charge">Pronto — à espera do carregador</string>
     <string name="permanent_180_title">Auto 180°</string>
-    <string name="permanent_180_description">Expande a rotação automática para 0°, 90°, 180° e 270° e permanece ativa em segundo plano.</string>
-    <string name="permanent_180_short">0°, 90°, 180° e 270° automaticamente</string>
+    <string name="permanent_180_description">Alterna automaticamente entre retrato normal (0°) e invertido (180°). Não ativa o modo paisagem.</string>
+    <string name="permanent_180_short">Alterna automaticamente entre 0° e 180° na vertical.</string>
     <string name="auto_charge_title">Carregamento</string>
     <string name="auto_charge_description">Força 180° enquanto está ligado à corrente e regressa ao modo anterior quando desligado.</string>
     <string name="auto_charge_short">Roda automaticamente ao ligar o cabo</string>
@@ -41,7 +41,7 @@
     <string name="exceptions_eyebrow">CONTROLO DE APPS</string>
     <plurals name="app_exceptions_selected_count"><item quantity="one">%d app excluída</item><item quantity="other">%d apps excluídas</item></plurals>
     <string name="usage_access_title">Acesso de utilização necessário</string>
-    <string name="usage_access_description">Esta permissão permite ao Rotate 180° detetar qual app está aberta e aplicar as exceções.</string>
+    <string name="usage_access_description">O acesso aos dados de utilização permite detetar a app aberta e aplicar exclusões. A lista fica neste dispositivo; os dados de utilização não são enviados a servidores da app.</string>
     <string name="open_usage_access_settings">ABRIR ACESSO DE UTILIZAÇÃO</string>
     <string name="background_title">Fiabilidade em segundo plano</string>
     <string name="background_description">Reveja as definições de bateria para tornar o controlo contínuo da rotação mais fiável.</string>
@@ -108,4 +108,6 @@
     <string name="neo_mode_starting">STARTING / SERVICE</string>
     <string name="neo_mode_paused">PAUSED / SERVICE</string>
     <string name="neo_accessibility_dial">Indicador visual de rotação</string>
+    <string name="privacy_policy_title">Política de privacidade</string>
+    <string name="privacy_policy_description">Saiba como são tratados os acessos, as exclusões e as definições locais.</string>
 </resources>
