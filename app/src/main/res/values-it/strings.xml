@@ -22,8 +22,8 @@
     <string name="status_waiting_charge">Pronta — in attesa del caricatore</string>
 
     <string name="permanent_180_title">Auto 180°</string>
-    <string name="permanent_180_description">Estende la rotazione automatica a 0°, 90°, 180° e 270° e resta attiva in background.</string>
-    <string name="permanent_180_short">0°, 90°, 180° e 270° in automatico</string>
+    <string name="permanent_180_description">Passa automaticamente tra ritratto normale (0°) e capovolto (180°). Non attiva la modalità orizzontale.</string>
+    <string name="permanent_180_short">Passa automaticamente tra 0° e 180° in verticale.</string>
     <string name="auto_charge_title">Ricarica</string>
     <string name="auto_charge_description">Forza 180° quando colleghi l’alimentazione e torna alla modalità precedente quando la scolleghi.</string>
     <string name="auto_charge_short">Ruota automaticamente quando colleghi il cavo</string>
@@ -49,7 +49,7 @@
     </plurals>
 
     <string name="usage_access_title">Accesso utilizzo app richiesto</string>
-    <string name="usage_access_description">Questo permesso permette a Rotate 180° di capire quale app è aperta e applicare le eccezioni.</string>
+    <string name="usage_access_description">L\'accesso ai dati di utilizzo consente a Rotate 180° di capire quale app è aperta per applicare le eccezioni che hai scelto. Le app escluse sono salvate sul dispositivo; i dati di utilizzo non vengono inviati a un server dell\'app.</string>
     <string name="open_usage_access_settings">APRI ACCESSO UTILIZZO APP</string>
     <string name="background_title">Affidabilità in background</string>
     <string name="background_description">Controlla le impostazioni batteria per rendere più affidabile la rotazione continua.</string>
@@ -117,4 +117,6 @@
     <string name="neo_mode_starting">STARTING / SERVICE</string>
     <string name="neo_mode_paused">PAUSED / SERVICE</string>
     <string name="neo_accessibility_dial">Indicatore visivo dello stato della rotazione</string>
+    <string name="privacy_policy_title">Informativa sulla privacy</string>
+    <string name="privacy_policy_description">Scopri come vengono gestiti i permessi, le eccezioni e le impostazioni locali.</string>
 </resources>

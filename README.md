@@ -6,7 +6,7 @@ Lightweight Android utility that adds reliable reverse portrait / 180° rotation
 
 - Display name: `Rotate 180°`
 - Legacy package identity: `com.flipcharge.app`
-- Version: `0.7.1` (`versionCode 9`)
+- Version: `0.8.2` (`versionCode 12`)
 - Native Kotlin + Jetpack Compose
 - Android `minSdk 26`, `targetSdk 36`
 - Manual fixed 180° mode
@@ -20,7 +20,7 @@ Lightweight Android utility that adds reliable reverse portrait / 180° rotation
 - Release APK budget: **8 MiB**
 - Release AAB budget: **10 MiB**
 - Commercial model: **paid upfront €4.99; no ads**
-- Minimal black `180°` pixel-art adaptive launcher icon
+- Minimal dark `180°` launcher icon (store asset redesign pending review)
 
 ## Signing
 
@@ -28,7 +28,15 @@ Release builds use a persistent INTERNAL signing identity supplied only through 
 
 ## Build
 
-GitHub Actions is the canonical build path. `Development checks` validates test/lint/release/size. `Build signed release` is manual and requires the four Android signing secrets.
+GitHub Actions is the canonical build path. `Development checks` validates test/lint/release/size. `Build signed release` is available on main after an explicitly marked signed-release commit (or manual dispatch) and requires the four Android signing secrets.
+
+## Google Play release readiness
+
+- Production remains **NO-GO** until device QA and Play Console review.
+- [Privacy Policy](https://rotate180-privacy.vercel.app/) (IT/EN, publisher identity and contact pending final verification).
+- [48-item audit checklist](RELEASE_CHECKLIST.md) and [test runbook](docs/PREPUBLICATION_AUDIT_V081_2026-11-12.md).
+- The Auto 180° orientation engine supports **upright 0° and reverse portrait 180° only**; never promises landscape modes.
+- [Store listing drafts](store/listings/) and [ASO asset plan](store/ASSETS_SPEC.md) — not Play-approved.
 
 ## Factory baseline
 
