@@ -44,26 +44,26 @@ private val LightColors = lightColorScheme(
 )
 
 private val DarkColors = darkColorScheme(
-    primary = Color(0xFFAEC6FF),
-    onPrimary = Color(0xFF002D70),
-    primaryContainer = Color(0xFF183E8C),
-    onPrimaryContainer = Color(0xFFD9E3FF),
-    secondary = Color(0xFFD0BCFF),
-    onSecondary = Color(0xFF381E72),
-    secondaryContainer = Color(0xFF4F378B),
-    onSecondaryContainer = Color(0xFFEADDFF),
-    tertiary = Color(0xFF7FE1BF),
-    onTertiary = Color(0xFF00382A),
-    tertiaryContainer = Color(0xFF075D45),
-    onTertiaryContainer = Color(0xFFA0F2D4),
-    background = Color(0xFF101116),
-    onBackground = Color(0xFFE8EAF0),
-    surface = Color(0xFF17191F),
-    onSurface = Color(0xFFF0F1F5),
-    surfaceVariant = Color(0xFF22252D),
-    onSurfaceVariant = Color(0xFFB9BDC9),
-    outline = Color(0xFF3A3E48),
-    error = Color(0xFFFFB4AB),
+    primary = Color(0xFF38DCCA),
+    onPrimary = Color(0xFF062A28),
+    primaryContainer = Color(0xFF173A38),
+    onPrimaryContainer = Color(0xFFBDF9EB),
+    secondary = Color(0xFF9EB6BA),
+    onSecondary = Color(0xFF182C30),
+    secondaryContainer = Color(0xFF263B42),
+    onSecondaryContainer = Color(0xFFD8E9E9),
+    tertiary = Color(0xFFF1C487),
+    onTertiary = Color(0xFF33200E),
+    tertiaryContainer = Color(0xFF4B3424),
+    onTertiaryContainer = Color(0xFFFFE3BA),
+    background = Color(0xFF0B1015),
+    onBackground = Color(0xFFEAF1F1),
+    surface = Color(0xFF151E24),
+    onSurface = Color(0xFFEAF1F1),
+    surfaceVariant = Color(0xFF24343A),
+    onSurfaceVariant = Color(0xFF9EADB3),
+    outline = Color(0xFF425B61),
+    error = Color(0xFFF9A19A),
 )
 
 private val FlipTypography = Typography(
@@ -114,7 +114,7 @@ private val FlipShapes = Shapes(
 
 @Composable
 fun FlipChargeTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
