@@ -1,5 +1,8 @@
 package com.flipcharge.app
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,15 +26,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -41,15 +47,23 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.flipcharge.app.ui.theme.Manrope
+import com.flipcharge.app.ui.theme.SpaceGrotesk
+import kotlin.math.min
 
-/** All surfaces are native Compose. No external raster art / fonts / runtime dependency. */
+/**
+ * Pixel-level translation of the APPROVED Neo Tactile Dark web preview V2,
+ * not the superseded Retro Pixel PR. UI-only; sensor/service state is supplied
+ * by MainActivity exactly as before. Original geometry/gradients authored
+ * in Compose; no WebView or third-party image assets.
+ */
 internal object NeoPalette {
     val Background = Color(0xFF0B1015)
     val SurfaceHigh = Color(0xFF24343A)
     val SurfaceMid = Color(0xFF17262C)
     val SurfaceLow = Color(0xFF101A20)
     val Border = Color(0xFF425B61)
-    val Highlight = Color(0xFF66868A)
+    val Highlight = Color(0xFF86AAA9)
     val Ink = Color(0xFFEAF1F1)
     val Subtle = Color(0xFF9EADB3)
     val Muted = Color(0xFF71868C)
@@ -58,30 +72,93 @@ internal object NeoPalette {
     val Danger = Color(0xFFF9A19A)
 }
 
-private val panelShape = RoundedCornerShape(24.dp)
-private val panelGradient = Brush.linearGradient(
-    colors = listOf(NeoPalette.SurfaceHigh, NeoPalette.SurfaceMid, NeoPalette.SurfaceLow),
+internal enum class NeoRuntimeTone { ACTIVE, INACTIVE, WAITING, ERROR, PERMISSION, STARTING, PAUSED }
+
+internal enum class NeoModeGlyph { ROTATE, CHARGING }
+internal enum class NeoUtilityGlyph { APPS, BATTERY }
+
+private val heroShape = RoundedCornerShape(24.dp)
+private val manualShape = RoundedCornerShape(21.dp)
+private val modeShape = RoundedCornerShape(17.dp)
+
+private val heroSurface = Brush.linearGradient(
+    listOf(Color(0xFF24343A), Color(0xFF17262C), Color(0xFF111B22)),
+)
+private val controlSurface = Brush.linearGradient(
+    listOf(Color(0xFF25353A), Color(0xFF162329), Color(0xFF101C22)),
+)
+private val modeSurface = Brush.linearGradient(
+    listOf(Color(0xFF1B282E), Color(0xFF121D23)),
 )
 
+/** Subtle layered elevation; avoids a generic flat Material Card. */
+private fun Modifier.neoRaisedSurface(
+    shape: RoundedCornerShape,
+    brush: Brush,
+    border: Color,
+    elevation: Dp,
+): Modifier = this
+    .shadow(elevation = elevation, shape = shape, ambientColor = Color.Black, spotColor = Color.Black)
+    .background(brush = brush, shape = shape)
+    .border(1.dp, border, shape)
+    .drawBehind {
+        // Bottom edge shadow is intentionally non-uniform.
+        drawLine(
+            color = Color.Black.copy(alpha = .33f),
+            start = Offset(24.dp.toPx(), size.height - 1.dp.toPx()),
+            end = Offset(size.width - 24.dp.toPx(), size.height - 1.dp.toPx()),
+            strokeWidth = 1.dp.toPx(),
+        )
+    }
+
+/** The small raised settings button from the web reference, 48dp touch target. */
 internal fun Modifier.neoSmallPanel(): Modifier = this
     .size(48.dp)
-    .border(1.dp, NeoPalette.Border, RoundedCornerShape(13.dp))
-    .background(
-        Brush.linearGradient(listOf(NeoPalette.SurfaceHigh, NeoPalette.SurfaceLow)),
-        RoundedCornerShape(13.dp),
+    .neoRaisedSurface(
+        shape = RoundedCornerShape(13.dp),
+        brush = Brush.linearGradient(listOf(Color(0xFF1E2D34), Color(0xFF101B21))),
+        border = Color(0xFF3D555C),
+        elevation = 4.dp,
     )
 
 @Composable
-internal fun NeoSectionHeader(text: String) {
-    Text(
-        text = text.uppercase(),
-        style = MaterialTheme.typography.labelMedium,
-        fontWeight = FontWeight.Bold,
-        letterSpacing = 1.3.sp,
-        color = NeoPalette.Subtle,
-        maxLines = 2,
-        overflow = TextOverflow.Ellipsis,
-    )
+internal fun NeoSectionHeader(title: String, index: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 3.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = title,
+            modifier = Modifier.weight(1f),
+            fontFamily = Manrope,
+            fontSize = 10.sp,
+            lineHeight = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = NeoPalette.Subtle,
+            letterSpacing = 1.25.sp,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = index,
+            fontFamily = Manrope,
+            fontSize = 9.sp,
+            lineHeight = 13.sp,
+            color = Color(0xFF597E80),
+            letterSpacing = .3.sp,
+            maxLines = 1,
+        )
+    }
+}
+
+private fun toneColor(tone: NeoRuntimeTone): Color = when (tone) {
+    NeoRuntimeTone.ACTIVE -> NeoPalette.Teal
+    NeoRuntimeTone.WAITING -> NeoPalette.Amber
+    NeoRuntimeTone.ERROR, NeoRuntimeTone.PERMISSION -> NeoPalette.Danger
+    NeoRuntimeTone.STARTING -> NeoPalette.Amber
+    NeoRuntimeTone.PAUSED, NeoRuntimeTone.INACTIVE -> NeoPalette.Subtle
 }
 
 @Composable
@@ -89,189 +166,278 @@ internal fun NeoHeroCard(
     value: String,
     title: String,
     detail: String,
-    operational: Boolean,
-    waiting: Boolean,
-    issue: Boolean,
+    modeLabel: String,
+    stateLabel: String,
+    engineLabel: String,
+    modeEyebrow: String,
+    dialDescription: String,
+    tone: NeoRuntimeTone,
 ) {
-    val statusColor = when {
-        issue -> NeoPalette.Danger
-        operational -> NeoPalette.Teal
-        waiting -> NeoPalette.Amber
-        else -> NeoPalette.Subtle
-    }
+    val accent = toneColor(tone)
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, NeoPalette.Border, panelShape)
-            .background(panelGradient, panelShape)
+            .neoRaisedSurface(heroShape, heroSurface, Color(0xFF3A565B), 11.dp)
+            .clip(heroShape)
             .padding(horizontal = 18.dp, vertical = 19.dp),
-        verticalArrangement = Arrangement.spacedBy(15.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                text = title.uppercase(),
-                style = MaterialTheme.typography.labelMedium,
-                color = NeoPalette.Subtle,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.sp,
+                text = title,
                 modifier = Modifier.weight(1f),
+                fontFamily = Manrope,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 14.sp,
+                color = Color(0xFFB5CCCE),
+                letterSpacing = 1.25.sp,
+                maxLines = 2,
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier
-                    .clip(CircleShape)
-                    .background(NeoPalette.Background.copy(alpha = 0.72f))
+                    .border(
+                        1.dp,
+                        accent.copy(alpha = if (tone == NeoRuntimeTone.ACTIVE) .45f else .24f),
+                        CircleShape,
+                    )
+                    .background(Color(0xFF0F1A20).copy(alpha = .84f), CircleShape)
                     .padding(horizontal = 10.dp, vertical = 7.dp),
             ) {
-                Box(Modifier.size(6.dp).background(statusColor, CircleShape))
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .shadow(
+                            if (tone == NeoRuntimeTone.ACTIVE) 5.dp else 0.dp,
+                            CircleShape,
+                            ambientColor = accent,
+                            spotColor = accent,
+                        )
+                        .background(accent, CircleShape),
+                )
                 Text(
-                    text = if (operational) "ON" else if (issue) "!" else "OFF",
-                    color = statusColor,
-                    style = MaterialTheme.typography.labelSmall,
+                    text = stateLabel,
+                    color = accent,
+                    fontFamily = Manrope,
                     fontWeight = FontWeight.Bold,
+                    fontSize = 9.sp,
+                    letterSpacing = .7.sp,
+                    maxLines = 1,
                 )
             }
         }
-
+        Spacer(Modifier.height(12.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(7.dp),
             ) {
                 Text(
-                    text = value,
-                    color = if (operational) Color(0xFFD7FFF6) else NeoPalette.Ink,
-                    fontSize = if (value.length > 3) 46.sp else 60.sp,
-                    lineHeight = 62.sp,
+                    text = modeEyebrow,
+                    fontFamily = Manrope,
+                    color = Color(0xFF658F94),
+                    letterSpacing = 1.15.sp,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = (-2).sp,
+                    fontSize = 10.sp,
+                    maxLines = 2,
+                )
+                Text(
+                    text = value,
+                    fontFamily = SpaceGrotesk,
+                    fontSize = if (value.length > 3) 43.sp else 62.sp,
+                    lineHeight = 64.sp,
+                    letterSpacing = (-3).sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    color = if (tone == NeoRuntimeTone.ACTIVE) Color(0xFFD6FFF5) else NeoPalette.Ink,
                 )
                 Text(
                     text = detail,
-                    style = MaterialTheme.typography.bodySmall,
+                    fontFamily = Manrope,
+                    fontSize = 11.sp,
+                    lineHeight = 16.sp,
                     color = NeoPalette.Subtle,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Spacer(Modifier.width(10.dp))
-            NeoOrientationDial(operational)
+            NeoOrientationDial(
+                active = tone == NeoRuntimeTone.ACTIVE,
+                description = dialDescription,
+            )
         }
-
+        Spacer(Modifier.height(16.dp))
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(1.dp)
-                .background(NeoPalette.Highlight.copy(alpha = 0.23f)),
+                .background(Brush.horizontalGradient(listOf(Color(0xFF93C6C5).copy(alpha = .20f), Color.Transparent))),
         )
+        Spacer(Modifier.height(12.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "180°",
-                style = MaterialTheme.typography.labelMedium,
-                color = NeoPalette.Muted,
+                text = engineLabel,
+                fontFamily = Manrope,
+                fontSize = 10.sp,
+                letterSpacing = .7.sp,
+                color = Color(0xFF7F969B),
             )
             Text(
-                text = when {
-                    issue -> "!"
-                    operational -> "●"
-                    waiting -> "◌"
-                    else -> "○"
-                },
-                color = statusColor,
-                style = MaterialTheme.typography.labelMedium,
+                text = modeLabel,
+                fontFamily = SpaceGrotesk,
+                fontSize = 10.sp,
+                lineHeight = 13.sp,
+                letterSpacing = .8.sp,
+                maxLines = 1,
+                color = Color(0xFFACC3C2),
             )
         }
     }
 }
 
 @Composable
-private fun NeoOrientationDial(operational: Boolean) {
+private fun NeoOrientationDial(active: Boolean, description: String) {
     Box(
         modifier = Modifier
-            .size(122.dp)
-            .border(1.dp, NeoPalette.Highlight, CircleShape)
-            .background(
-                Brush.linearGradient(
-                    listOf(Color(0xFF536C6C), Color(0xFF1B2D32), Color(0xFF344B50)),
-                ),
-                CircleShape,
-            )
-            .padding(9.dp),
+            .size(130.dp)
+            .semantics { contentDescription = description },
         contentAlignment = Alignment.Center,
     ) {
         Box(
             modifier = Modifier
-                .size(104.dp)
-                .border(1.dp, Color(0xFF263D42), CircleShape)
+                .size(128.dp)
+                .shadow(11.dp, CircleShape, ambientColor = Color.Black, spotColor = Color.Black)
                 .background(
-                    Brush.radialGradient(
-                        listOf(Color(0xFF2B3E45), Color(0xFF0A151A)),
+                    Brush.sweepGradient(
+                        0.0f to Color(0xFF31484C),
+                        .07f to Color(0xFF779395),
+                        .17f to Color(0xFF1B2E32),
+                        .52f to Color(0xFF142126),
+                        .84f to Color(0xFF536B6D),
+                        1.0f to Color(0xFF31484C),
                     ),
                     CircleShape,
-                ),
+                )
+                .border(1.dp, Color(0xFF8BA9A5).copy(alpha = .48f), CircleShape),
         )
-        Canvas(Modifier.size(115.dp)) {
-            drawArc(
-                color = if (operational) NeoPalette.Teal else Color(0xFF547876),
-                startAngle = if (operational) 135f else 210f,
-                sweepAngle = 168f,
-                useCenter = false,
-                style = Stroke(width = 3.dp.toPx()),
+        Box(
+            modifier = Modifier
+                .size(110.dp)
+                .shadow(1.dp, CircleShape)
+                .background(
+                    Brush.radialGradient(
+                        listOf(Color(0xFF293D44), Color(0xFF121D23), Color(0xFF0A1419)),
+                        center = Offset(28f, 26f),
+                    ),
+                    CircleShape,
+                )
+                .border(1.dp, Color(0xFF0A171B), CircleShape),
+        )
+        Canvas(Modifier.size(99.dp)) {
+            drawCircle(
+                color = Color(0xFF81B2AC).copy(alpha = .18f),
+                radius = size.minDimension * .43f,
+                style = Stroke(
+                    width = 1.dp.toPx(),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(2f, 7f)),
+                ),
             )
         }
-        NeoMetalThumb(61.dp)
-        Text(
-            text = "↻",
-            color = Color(0xFF244C4D),
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
-        )
+        Canvas(Modifier.size(130.dp)) {
+            drawArc(
+                color = if (active) Color(0xFF3EF1D4) else Color(0xFF528C88),
+                startAngle = if (active) 316f else 135f,
+                sweepAngle = 105f,
+                useCenter = false,
+                style = Stroke(3.dp.toPx(), cap = StrokeCap.Round),
+            )
+        }
+        NeoMetalDisc(69.dp)
+        Canvas(Modifier.size(25.dp)) {
+            val w = size.width
+            val h = size.height
+            drawArc(
+                color = Color(0xFF244C4D),
+                startAngle = 20f,
+                sweepAngle = 292f,
+                useCenter = false,
+                topLeft = Offset(w * .10f, h * .10f),
+                size = androidx.compose.ui.geometry.Size(w * .80f, h * .80f),
+                style = Stroke(2.dp.toPx(), cap = StrokeCap.Round),
+            )
+            // Arrow head integrated into the etched circular symbol.
+            val arrow = Path().apply {
+                moveTo(w * .76f, h * .18f)
+                lineTo(w * .87f, h * .44f)
+                lineTo(w * .58f, h * .40f)
+            }
+            drawPath(arrow, color = Color(0xFF244C4D), style = Stroke(2.dp.toPx(), cap = StrokeCap.Round))
+        }
     }
 }
 
-/** Fine brushed lines are drawn at runtime; no bitmap assets or third-party IP. */
+/**
+ * Multi-stop brushed titanium with etched diagonal lines, inner bevel and
+ * soft shadow. This recreates the tactile switch thumb in the approved web V2.
+ */
 @Composable
-private fun NeoMetalThumb(diameter: Dp) {
+private fun NeoMetalDisc(diameter: Dp) {
     Box(
         modifier = Modifier
             .size(diameter)
-            .border(1.dp, Color(0xFFE9F1EB), CircleShape)
+            .shadow(8.dp, CircleShape, ambientColor = Color.Black, spotColor = Color.Black)
             .background(
                 Brush.linearGradient(
                     listOf(
-                        Color(0xFFEAF1EA),
-                        Color(0xFFA9C0BA),
-                        Color(0xFFD3E0D9),
-                        Color(0xFF829995),
+                        Color(0xFFA6BAB8),
+                        Color(0xFFD7E5E0),
+                        Color(0xFF98ADAB),
+                        Color(0xFFE5EFEA),
+                        Color(0xFF859B97),
                     ),
                 ),
                 CircleShape,
             )
+            .border(1.dp, Color(0xFFE8F6EE), CircleShape)
             .clip(CircleShape),
+        contentAlignment = Alignment.Center,
     ) {
         Canvas(Modifier.matchParentSize()) {
+            // Lines stay inside the clipped circle and scale with thumb radius.
             var x = -size.height
-            while (x < size.width + size.height) {
+            while (x <= size.width + size.height) {
                 drawLine(
-                    color = Color.White.copy(alpha = 0.20f),
+                    color = Color.White.copy(alpha = .28f),
                     start = Offset(x, 0f),
                     end = Offset(x + size.height, size.height),
+                    strokeWidth = 1.1f,
+                )
+                drawLine(
+                    color = Color(0xFF284848).copy(alpha = .11f),
+                    start = Offset(x + 2f, 0f),
+                    end = Offset(x + 2f + size.height, size.height),
                     strokeWidth = 1f,
                 )
-                x += 6f
+                x += 5.0f
             }
+            drawCircle(
+                color = Color.White.copy(alpha = .52f),
+                radius = size.minDimension * .39f,
+                style = Stroke(width = 1.dp.toPx()),
+            )
         }
     }
 }
@@ -286,32 +452,28 @@ internal fun NeoSwitch(
     large: Boolean = false,
 ) {
     val width = if (large) 118.dp else 66.dp
-    val height = if (large) 65.dp else 39.dp
-    val knob = if (large) 52.dp else 30.dp
-    val shift by animateDpAsState(
-        targetValue = if (checked) width - knob - 10.dp else 0.dp,
-        animationSpec = tween(250),
-        label = "tactile-switch-travel",
+    val height = if (large) 65.dp else 48.dp
+    val trackHeight = if (large) 65.dp else 38.dp
+    val thumbSize = if (large) 51.dp else 28.dp
+    val travel by animateDpAsState(
+        targetValue = if (checked) width - thumbSize - 10.dp else 0.dp,
+        animationSpec = tween(280),
+        label = "metal-thumb-translation",
     )
-    val trackGradient = if (checked) {
-        Brush.linearGradient(
-            listOf(Color(0xFF0A9C91), Color(0xFF22E1C4), Color(0xFF0C8479)),
-        )
+    val border by animateColorAsState(
+        if (checked) Color(0xFF54BBAE) else Color(0xFF607277),
+        animationSpec = tween(220),
+        label = "track-border",
+    )
+    val track = if (checked) {
+        Brush.linearGradient(listOf(Color(0xFF07AD9F), Color(0xFF1FE2C0), Color(0xFF0C8E84)))
     } else {
-        Brush.verticalGradient(
-            listOf(Color(0xFF111C21), Color(0xFF273A3F), Color(0xFF101A20)),
-        )
+        Brush.verticalGradient(listOf(Color(0xFF101A20), Color(0xFF26363B), Color(0xFF121D23)))
     }
+
     Box(
         modifier = modifier
             .size(width, height)
-            .clip(CircleShape)
-            .border(
-                2.dp,
-                if (checked) Color(0xFF55C5B6) else Color(0xFF687C81),
-                CircleShape,
-            )
-            .background(trackGradient, CircleShape)
             .toggleable(
                 value = checked,
                 enabled = enabled,
@@ -319,77 +481,107 @@ internal fun NeoSwitch(
                 onValueChange = onCheckedChange,
             )
             .semantics { contentDescription = label }
-            .padding(5.dp),
+            .alpha(if (enabled) 1f else .52f),
         contentAlignment = Alignment.CenterStart,
     ) {
         Box(
-            modifier = Modifier.offset(x = shift),
+            modifier = Modifier
+                .size(width, trackHeight)
+                .shadow(
+                    if (checked) 8.dp else 4.dp,
+                    CircleShape,
+                    ambientColor = if (checked) NeoPalette.Teal.copy(alpha = .30f) else Color.Black,
+                    spotColor = if (checked) NeoPalette.Teal.copy(alpha = .30f) else Color.Black,
+                )
+                .background(track, CircleShape)
+                .border(2.dp, border, CircleShape)
+                .padding(4.dp)
+                .border(1.dp, Color.Black.copy(alpha = .32f), CircleShape),
+        )
+        Box(
+            modifier = Modifier
+                .padding(start = 5.dp)
+                .offset(x = travel),
         ) {
-            NeoMetalThumb(knob)
+            NeoMetalDisc(thumbSize)
         }
     }
 }
 
 @Composable
 internal fun NeoManualControl(
+    eyebrow: String,
     title: String,
-    detail: String,
+    subtitle: String,
+    onState: String,
+    offState: String,
     checked: Boolean,
     permissionGranted: Boolean,
     onToggle: () -> Unit,
 ) {
-    val shape = RoundedCornerShape(21.dp)
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .border(
-                1.dp,
-                if (checked) Color(0xFF3D9789) else NeoPalette.Border,
-                shape,
+            .neoRaisedSurface(
+                manualShape,
+                controlSurface,
+                if (checked) Color(0xFF3D9789) else Color(0xFF496368),
+                elevation = if (checked) 12.dp else 10.dp,
             )
-            .background(panelGradient, shape)
-            .padding(horizontal = 16.dp, vertical = 17.dp),
-        verticalArrangement = Arrangement.spacedBy(13.dp),
+            .clip(manualShape)
+            .padding(start = 16.dp, end = 16.dp, top = 19.dp, bottom = 14.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(7.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
                 Text(
-                    text = "180°",
-                    color = NeoPalette.Teal,
-                    style = MaterialTheme.typography.labelLarge,
-                    letterSpacing = 1.2.sp,
+                    text = eyebrow,
+                    color = Color(0xFF82AEB1),
+                    fontFamily = Manrope,
+                    fontSize = 9.sp,
+                    letterSpacing = 1.1.sp,
                     fontWeight = FontWeight.Bold,
+                    maxLines = 1,
                 )
                 Text(
                     text = title,
+                    fontFamily = SpaceGrotesk,
                     color = NeoPalette.Ink,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontSize = 19.sp,
+                    lineHeight = 23.sp,
+                    letterSpacing = (-.4).sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 2,
+                )
+                Text(
+                    text = subtitle,
+                    fontFamily = Manrope,
+                    color = Color(0xFF849CA3),
+                    fontSize = 11.sp,
+                    lineHeight = 16.sp,
                     maxLines = 2,
                 )
             }
             NeoSwitch(
                 checked = checked,
-                enabled = true,
+                enabled = true, // Without permission, native callback opens permission settings.
                 label = title,
                 onCheckedChange = { onToggle() },
                 large = true,
             )
         }
-
+        Spacer(Modifier.height(16.dp))
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(NeoPalette.Highlight.copy(alpha = 0.18f)),
+            Modifier.fillMaxWidth().height(1.dp)
+                .background(Color(0xFF9DD6D5).copy(alpha = .18f)),
         )
+        Spacer(Modifier.height(11.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -397,28 +589,71 @@ internal fun NeoManualControl(
         ) {
             Box(
                 Modifier.size(6.dp).background(
-                    if (checked) NeoPalette.Teal else if (!permissionGranted) NeoPalette.Amber else NeoPalette.Muted,
+                    if (!permissionGranted) NeoPalette.Amber else if (checked) NeoPalette.Teal else NeoPalette.Muted,
                     CircleShape,
                 ),
             )
             Text(
-                text = if (!permissionGranted) {
-                    "!"
-                } else if (checked) {
-                    "ON"
-                } else {
-                    "OFF"
-                },
-                style = MaterialTheme.typography.labelSmall,
+                text = if (checked) onState else offState,
+                fontFamily = Manrope,
                 color = if (checked) NeoPalette.Teal else NeoPalette.Subtle,
-                fontWeight = FontWeight.Bold,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.SemiBold,
             )
             Spacer(Modifier.weight(1f))
             Text(
-                text = "180°",
-                color = NeoPalette.Muted,
-                style = MaterialTheme.typography.labelSmall,
+                text = "MANUAL OVERRIDE",
+                fontFamily = SpaceGrotesk,
+                color = Color(0xFF66868B),
+                fontSize = 9.sp,
+                letterSpacing = .7.sp,
             )
+        }
+    }
+}
+
+@Composable
+private fun NeoModeSymbol(glyph: NeoModeGlyph, accent: Color) {
+    Box(
+        modifier = Modifier
+            .size(38.dp)
+            .shadow(3.dp, RoundedCornerShape(12.dp))
+            .background(
+                Brush.linearGradient(listOf(Color(0xFF31494F), Color(0xFF192C31))),
+                RoundedCornerShape(12.dp),
+            )
+            .border(1.dp, Color(0xFF48666B), RoundedCornerShape(12.dp)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(Modifier.size(20.dp)) {
+            if (glyph == NeoModeGlyph.ROTATE) {
+                drawArc(
+                    color = accent,
+                    startAngle = 20f,
+                    sweepAngle = 285f,
+                    useCenter = false,
+                    topLeft = Offset(size.width * .12f, size.height * .12f),
+                    size = androidx.compose.ui.geometry.Size(size.width * .76f, size.height * .76f),
+                    style = Stroke(1.75.dp.toPx(), cap = StrokeCap.Round),
+                )
+                val arrow = Path().apply {
+                    moveTo(size.width * .76f, size.height * .16f)
+                    lineTo(size.width * .90f, size.height * .44f)
+                    lineTo(size.width * .62f, size.height * .42f)
+                }
+                drawPath(arrow, color = accent, style = Stroke(1.8.dp.toPx(), cap = StrokeCap.Round))
+            } else {
+                val bolt = Path().apply {
+                    moveTo(size.width * .56f, size.height * .03f)
+                    lineTo(size.width * .20f, size.height * .55f)
+                    lineTo(size.width * .47f, size.height * .55f)
+                    lineTo(size.width * .39f, size.height * .98f)
+                    lineTo(size.width * .82f, size.height * .40f)
+                    lineTo(size.width * .55f, size.height * .40f)
+                    close()
+                }
+                drawPath(bolt, color = accent)
+            }
         }
     }
 }
@@ -427,7 +662,7 @@ internal fun NeoManualControl(
 internal fun NeoModeRow(
     title: String,
     subtitle: String,
-    glyph: String,
+    glyph: NeoModeGlyph,
     accent: Color,
     checked: Boolean,
     enabled: Boolean,
@@ -436,44 +671,34 @@ internal fun NeoModeRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .alpha(if (enabled) 1f else 0.60f)
-            .border(1.dp, NeoPalette.Border.copy(alpha = 0.80f), RoundedCornerShape(17.dp))
-            .background(
-                Brush.linearGradient(listOf(NeoPalette.SurfaceMid, NeoPalette.SurfaceLow)),
-                RoundedCornerShape(17.dp),
-            )
-            .heightIn(min = 82.dp)
-            .padding(12.dp),
+            .neoRaisedSurface(modeShape, modeSurface, Color(0xFF364B51), 5.dp)
+            .heightIn(min = 78.dp)
+            .padding(horizontal = 13.dp, vertical = 13.dp)
+            .alpha(if (enabled) 1f else .55f),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .size(39.dp)
-                .border(1.dp, NeoPalette.Highlight, RoundedCornerShape(12.dp))
-                .background(
-                    Brush.linearGradient(listOf(Color(0xFF30494F), Color(0xFF192A30))),
-                    RoundedCornerShape(12.dp),
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(text = glyph, color = accent, fontSize = 19.sp, fontWeight = FontWeight.Bold)
-        }
+        NeoModeSymbol(glyph, accent)
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
                 text = title,
+                fontFamily = Manrope,
                 color = NeoPalette.Ink,
-                style = MaterialTheme.typography.titleSmall,
+                fontSize = 13.sp,
+                lineHeight = 18.sp,
                 fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
             )
             Text(
                 text = subtitle,
-                color = NeoPalette.Subtle,
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 3,
+                fontFamily = Manrope,
+                color = Color(0xFF83999F),
+                fontSize = 10.sp,
+                lineHeight = 14.sp,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
         }
@@ -487,10 +712,54 @@ internal fun NeoModeRow(
 }
 
 @Composable
+private fun NeoUtilitySymbol(glyph: NeoUtilityGlyph, attention: Boolean) {
+    Box(
+        modifier = Modifier
+            .size(37.dp)
+            .background(Color(0xFF1A2A30), RoundedCornerShape(11.dp))
+            .border(1.dp, Color(0xFF365258), RoundedCornerShape(11.dp)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(Modifier.size(18.dp)) {
+            val lineColor = if (attention) NeoPalette.Amber else Color(0xFF9FBFC0)
+            if (glyph == NeoUtilityGlyph.APPS) {
+                drawRoundRect(
+                    color = lineColor,
+                    topLeft = Offset(size.width * .13f, size.height * .13f),
+                    size = androidx.compose.ui.geometry.Size(size.width * .74f, size.height * .74f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(3f),
+                    style = Stroke(1.55.dp.toPx()),
+                )
+                drawRect(
+                    color = lineColor,
+                    topLeft = Offset(size.width * .36f, size.height * .36f),
+                    size = androidx.compose.ui.geometry.Size(size.width * .28f, size.height * .28f),
+                    style = Stroke(1.5.dp.toPx()),
+                )
+            } else {
+                drawRoundRect(
+                    color = lineColor,
+                    topLeft = Offset(size.width * .06f, size.height * .24f),
+                    size = androidx.compose.ui.geometry.Size(size.width * .79f, size.height * .53f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f),
+                    style = Stroke(1.55.dp.toPx()),
+                )
+                drawLine(
+                    color = lineColor,
+                    start = Offset(size.width * .92f, size.height * .41f),
+                    end = Offset(size.width * .92f, size.height * .62f),
+                    strokeWidth = 1.6.dp.toPx(),
+                )
+            }
+        }
+    }
+}
+
+@Composable
 internal fun NeoUtilityRow(
     title: String,
     subtitle: String,
-    glyph: String,
+    glyph: NeoUtilityGlyph,
     onClick: () -> Unit,
     attention: Boolean = false,
 ) {
@@ -498,47 +767,43 @@ internal fun NeoUtilityRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .heightIn(min = 68.dp)
-            .padding(vertical = 8.dp, horizontal = 3.dp),
+            .heightIn(min = 70.dp)
+            .padding(vertical = 10.dp, horizontal = 1.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .size(37.dp)
-                .border(1.dp, NeoPalette.Border, RoundedCornerShape(11.dp))
-                .background(NeoPalette.SurfaceMid, RoundedCornerShape(11.dp)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = glyph,
-                color = if (attention) NeoPalette.Amber else NeoPalette.Subtle,
-                style = MaterialTheme.typography.titleLarge,
-            )
-        }
+        NeoUtilitySymbol(glyph, attention)
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleSmall,
+                fontFamily = Manrope,
                 color = NeoPalette.Ink,
+                fontSize = 12.sp,
+                lineHeight = 16.sp,
                 fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
             )
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = NeoPalette.Subtle,
+                fontFamily = Manrope,
+                color = NeoPalette.Muted,
+                fontSize = 10.sp,
+                lineHeight = 14.sp,
                 maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
             )
         }
         Text(
             text = "›",
+            fontFamily = SpaceGrotesk,
+            fontSize = 21.sp,
             color = NeoPalette.Subtle,
-            style = MaterialTheme.typography.titleLarge,
         )
     }
+    Box(Modifier.fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = .075f)))
 }
 
 @Composable
@@ -551,23 +816,35 @@ internal fun NeoPermissionCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, Color(0xFF8D6750), RoundedCornerShape(17.dp))
-            .background(Color(0xFF2D2724), RoundedCornerShape(17.dp))
+            .background(
+                Brush.linearGradient(listOf(Color(0xFF332B26), Color(0xFF211B1A))),
+                RoundedCornerShape(15.dp),
+            )
+            .border(1.dp, Color(0xFFB07B5C), RoundedCornerShape(15.dp))
             .clickable(onClick = onClick)
-            .padding(16.dp),
+            .padding(15.dp),
         verticalArrangement = Arrangement.spacedBy(9.dp),
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = NeoPalette.Amber,
+            fontFamily = SpaceGrotesk,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFFF5D0AB),
         )
-        Text(text = body, style = MaterialTheme.typography.bodySmall, color = NeoPalette.Subtle)
+        Text(
+            text = body,
+            fontFamily = Manrope,
+            fontSize = 11.sp,
+            lineHeight = 17.sp,
+            color = Color(0xFFBFA99A),
+        )
         Text(
             text = action,
-            style = MaterialTheme.typography.labelLarge,
+            fontFamily = Manrope,
+            fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
-            color = NeoPalette.Amber,
+            color = Color(0xFFF3DDC5),
         )
     }
 }
