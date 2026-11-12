@@ -46,7 +46,7 @@ internal fun FlipHeroCard(
     active: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val shape = RoundedCornerShape(30.dp)
+    val shape = RoundedCornerShape(18.dp)
     val start = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
     val end = if (active) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surfaceVariant
 
@@ -66,6 +66,8 @@ internal fun FlipHeroCard(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            // Original pixel motif inspired by Design-App UIR-0001 / UIR-0012.
+            FlipPixelAccent(active = active)
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
@@ -82,6 +84,35 @@ internal fun FlipHeroCard(
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = if (active) Color.White.copy(alpha = 0.86f) else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+/**
+ * Decorative pixel blocks drawn in Compose, with no third-party raster assets.
+ * A visual reference only: runtime rotation and health semantics remain unchanged.
+ */
+@Composable
+internal fun FlipPixelAccent(
+    active: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val tint = if (active) Color.White else MaterialTheme.colorScheme.primary
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        repeat(7) { index ->
+            val selected = index == 3
+            Box(
+                modifier = Modifier
+                    .size(if (selected) 11.dp else 6.dp)
+                    .background(
+                        color = tint.copy(alpha = if (selected) 1f else 0.58f),
+                        shape = RoundedCornerShape(1.dp),
+                    ),
             )
         }
     }
@@ -125,7 +156,7 @@ internal fun FlipModeTile(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val shape = RoundedCornerShape(24.dp)
+    val shape = RoundedCornerShape(18.dp)
     Card(
         modifier = modifier
             .alpha(if (enabled) 1f else 0.52f)

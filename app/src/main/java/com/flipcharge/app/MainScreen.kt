@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -252,27 +255,60 @@ private fun PrimaryRotationAction(
     val start = if (active) FlipRose else MaterialTheme.colorScheme.primary
     val end = if (active) FlipOrange else MaterialTheme.colorScheme.secondary
 
-    Box(
+    Row(
         modifier = modifier
             .background(
                 brush = Brush.linearGradient(listOf(start, end)),
-                shape = RoundedCornerShape(22.dp),
+                shape = RoundedCornerShape(14.dp),
             )
+            // Keep the original permission and activation callback behavior.
             .clickable(enabled = enabled || !active, onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 17.dp),
-        contentAlignment = Alignment.Center,
+            .defaultMinSize(minHeight = 64.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        Box(
+            modifier = Modifier
+                .size(42.dp)
+                .background(Color.White.copy(alpha = 0.18f), RoundedCornerShape(6.dp)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = "180°",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Black,
+                color = Color.White,
+            )
+        }
         Text(
             text = if (active) {
                 stringResource(R.string.disable_forced_180)
             } else {
                 stringResource(R.string.enable_forced_180)
             },
-            color = androidx.compose.ui.graphics.Color.White,
+            modifier = Modifier.weight(1f),
+            color = Color.White,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
         )
+        // Non-interactive pixel indicator: no duplicated button semantics.
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+        ) {
+            repeat(3) { index ->
+                Box(
+                    modifier = Modifier
+                        .size(if (index == 1) 8.dp else 5.dp)
+                        .background(
+                            Color.White.copy(alpha = if (index == 1) 1f else 0.58f),
+                            RoundedCornerShape(1.dp),
+                        ),
+                )
+            }
+        }
     }
 }
 
