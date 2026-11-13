@@ -47,6 +47,9 @@ jobs:
           test -d "$ANDROID_HOME/platforms/android-36"
           test -x "$ANDROID_HOME/build-tools/36.0.0/apksigner"
 
+      - name: Verify store claims and privacy entry
+        run: python3 scripts/verify_release_readiness.py
+
       - name: Unit tests
         run: gradle :app:test
 

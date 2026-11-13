@@ -40,6 +40,7 @@ fun SettingsScreen(
     selectedLanguage: String,
     onBack: () -> Unit,
     onLanguageSelected: (String) -> Unit,
+    onOpenPrivacyPolicy: () -> Unit,
 ) {
     val choices = listOf(
         LanguageChoice(AppLocaleManager.SYSTEM_LANGUAGE, stringResource(R.string.language_system)),
@@ -147,6 +148,49 @@ fun SettingsScreen(
                 )
             }
 
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.privacy_policy_title),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    Text(
+                        text = stringResource(R.string.privacy_policy_description),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = onOpenPrivacyPolicy),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        ),
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 18.dp, vertical = 18.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.privacy_policy_title),
+                                modifier = Modifier.weight(1f),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            Text(
+                                text = "›",
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.titleLarge,
+                            )
+                        }
+                    }
+                }
+            }
             item { Spacer(Modifier.size(2.dp)) }
         }
     }

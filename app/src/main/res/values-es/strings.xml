@@ -20,8 +20,8 @@
     <string name="status_permanent_auto">Auto + 180° permanente activo</string>
     <string name="status_waiting_charge">Listo — esperando el cargador</string>
     <string name="permanent_180_title">Auto 180°</string>
-    <string name="permanent_180_description">Amplía la rotación automática a 0°, 90°, 180° y 270° y permanece activa en segundo plano.</string>
-    <string name="permanent_180_short">0°, 90°, 180° y 270° automáticamente</string>
+    <string name="permanent_180_description">Alterna automáticamente la orientación vertical normal (0°) e invertida (180°). No activa el modo horizontal.</string>
+    <string name="permanent_180_short">Alterna automáticamente entre 0° y 180° en vertical.</string>
     <string name="auto_charge_title">Carga</string>
     <string name="auto_charge_description">Fuerza 180° mientras está conectado a la corriente y vuelve al modo anterior al desconectarlo.</string>
     <string name="auto_charge_short">Gira automáticamente al conectar el cable</string>
@@ -41,7 +41,7 @@
     <string name="exceptions_eyebrow">CONTROL DE APPS</string>
     <plurals name="app_exceptions_selected_count"><item quantity="one">%d app excluida</item><item quantity="other">%d apps excluidas</item></plurals>
     <string name="usage_access_title">Se necesita acceso de uso</string>
-    <string name="usage_access_description">Este permiso permite a Rotate 180° detectar qué app está abierta y aplicar las excepciones.</string>
+    <string name="usage_access_description">El acceso al uso de apps permite detectar la app abierta para aplicar tus exclusiones. La lista se almacena en este dispositivo; los datos de uso no se envían a servidores de la app.</string>
     <string name="open_usage_access_settings">ABRIR ACCESO DE USO</string>
     <string name="background_title">Fiabilidad en segundo plano</string>
     <string name="background_description">Revisa los ajustes de batería para que el control continuo de rotación sea más fiable.</string>
@@ -69,4 +69,45 @@
     <string name="runtime_suspended_exception">En pausa por la excepción de la app actual</string>
     <string name="runtime_screen_off">En pausa mientras la pantalla está apagada</string>
     <string name="runtime_starting">Iniciando control de rotación…</string>
+
+    <!-- Neo Tactile Dark UI v0.8.1: localized preview-equivalent text -->
+    <string name="neo_header_eyebrow">PANTALLA / CONTROL</string>
+    <string name="neo_hero_heading">ORIENTACIÓN ACTUAL</string>
+    <string name="neo_section_manual">CONTROL PRINCIPAL</string>
+    <string name="neo_section_manual_index">01 — MANUAL</string>
+    <string name="neo_section_automation">AUTOMATIZACIONES</string>
+    <string name="neo_section_automation_index">02 — MODOS</string>
+    <string name="neo_section_tools">HERRAMIENTAS</string>
+    <string name="neo_section_tools_index">03 — PREFERENCIAS</string>
+    <string name="neo_manual_overline">ROTATE / 180°</string>
+    <string name="neo_manual_title">Forzar 180°</string>
+    <string name="neo_manual_description">Retrato invertido fijo.</string>
+    <string name="neo_manual_active">Control activado</string>
+    <string name="neo_manual_inactive">Control desactivado</string>
+    <string name="neo_auto_description">Rotación automática ampliada</string>
+    <string name="neo_charging_title">Durante la carga</string>
+    <string name="neo_charging_description">180° al conectar el cable</string>
+    <string name="neo_exceptions_description">Excluir apps concretas de la rotación</string>
+    <string name="neo_background_description">Optimización de batería y servicios</string>
+    <string name="neo_state_active">ACTIVO</string>
+    <string name="neo_state_inactive">INACTIVO</string>
+    <string name="neo_state_waiting">ESPERA</string>
+    <string name="neo_state_error">ERROR</string>
+    <string name="neo_state_permission">PERMISO</string>
+    <string name="neo_state_starting">INICIO</string>
+    <string name="neo_state_paused">PAUSA</string>
+    <string name="neo_state_engine">ROTATION ENGINE</string>
+    <string name="neo_mode_title">MODO</string>
+    <string name="neo_mode_standby">STANDBY / 00</string>
+    <string name="neo_mode_manual">MANUAL / 180</string>
+    <string name="neo_mode_charging">POWER / 180</string>
+    <string name="neo_mode_auto">AUTO / ACTIVE</string>
+    <string name="neo_mode_waiting">POWER / WAIT</string>
+    <string name="neo_mode_error">ERROR / SERVICE</string>
+    <string name="neo_mode_permission">ACCESS / REQUIRED</string>
+    <string name="neo_mode_starting">STARTING / SERVICE</string>
+    <string name="neo_mode_paused">PAUSED / SERVICE</string>
+    <string name="neo_accessibility_dial">Indicador visual de rotación</string>
+    <string name="privacy_policy_title">Política de privacidad</string>
+    <string name="privacy_policy_description">Consulta cómo se utilizan los permisos, las exclusiones y los ajustes locales.</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.flipcharge.app
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -21,6 +22,9 @@ class SettingsActivity : LocalizedActivity() {
                 SettingsScreen(
                     selectedLanguage = selectedLanguage.value,
                     onBack = { finish() },
+                    onOpenPrivacyPolicy = {
+                        startActivity(Intent(this, PrivacyPolicyActivity::class.java))
+                    },
                     onLanguageSelected = { languageCode ->
                         if (languageCode == selectedLanguage.value) return@SettingsScreen
 

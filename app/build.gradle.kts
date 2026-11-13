@@ -22,8 +22,8 @@ android {
         applicationId = "com.flipcharge.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 9
-        versionName = "0.7.1"
+        versionCode = 13
+        versionName = "0.8.3"
     }
 
     signingConfigs {
