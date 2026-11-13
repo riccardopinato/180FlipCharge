@@ -8,6 +8,9 @@ enum class TileMode {
     OFF,
 }
 
+/**
+ * Converts the current state into the tile display mode.
+ */
 fun FlipState.tileMode(): TileMode = when (source) {
     ActivationSource.MANUAL -> TileMode.FORCE_180
     ActivationSource.CHARGING -> TileMode.CHARGING
